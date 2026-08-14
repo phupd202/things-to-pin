@@ -285,6 +285,10 @@ body{
 .gate-card p{ font-size:13px; color:var(--ink-soft); margin:0 0 20px; line-height:1.5; }
 .gate-card .f-input{ margin-bottom:10px; text-align:left; padding:10px 12px; font-size:14px; }
 .gate-card .btn-solid{ width:100%; padding:11px; font-size:14px; border-radius:10px; margin-top:6px; }
+.gate-card select.f-input{ cursor:pointer; }
+.gate-hint{ font-size:12px; color:var(--ink-soft); text-align:left; margin:-4px 0 10px 2px; min-height:15px; }
+.gate-hint b{ color:var(--ink); }
+.gate-error{ font-size:12px; color:var(--urg-red); margin:8px 0 0; min-height:15px; }
 
 .footer-note{
   text-align:center; font-size:11px; color:rgba(35,38,43,.4); margin-top:30px; font-family:'IBM Plex Mono', monospace;

@@ -108,11 +108,15 @@
   <div class="gate-card">
     <div class="emoji">📌</div>
     <h2>Chào mừng đến Things to Pin</h2>
-    <p>Nhập tên và tổ chuyên môn để bắt đầu — phòng sẽ biết ai vừa ghim gì.</p>
-    <input class="f-input" id="gName" placeholder="Tên của bạn">
-    <input class="f-input" id="gTeam" placeholder="Tổ chuyên môn (gõ tên mới nếu chưa có)" list="teamList">
+    <p>Nhập tên đầy đủ và chọn tổ chuyên môn để bắt đầu — phòng sẽ biết ai vừa ghim gì.</p>
+    <input class="f-input" id="gName" placeholder="Tên đầy đủ, ví dụ: Nguyễn Văn An">
+    <p class="gate-hint" id="gNameHint"></p>
+    <select class="f-input" id="gTeam">
+      <option value="" disabled selected>— Chọn tổ chuyên môn —</option>
+    </select>
     <datalist id="teamList"></datalist>
     <button class="btn-solid" id="gEnter">Vào bảng ghim</button>
+    <p class="gate-error" id="gError"></p>
   </div>
 </div>
 
