@@ -354,6 +354,7 @@ body{
 
 /* ---------- workload heatmap sidebar ---------- */
 .layout{ display:grid; grid-template-columns:236px 1fr; gap:22px; align-items:start; }
+.layout > *{ min-width:0; } /* không cho nội dung rộng làm bung cột lưới */
 .side-col{
   display:flex; flex-direction:column; gap:16px;
   position:sticky; top:18px; max-height:calc(100vh - 36px); overflow-y:auto;
@@ -493,5 +494,52 @@ body{
 @media (max-width:900px){
   .wrap{ max-width:760px; }
   .layout{ grid-template-columns:1fr; }
-  .side-col{ position:static; max-height:none; overflow:visible; }
+  /* trên màn hẹp: bảng ghim lên trước, widget xuống dưới */
+  .side-col{ position:static; max-height:none; overflow:visible; order:2; }
+  .main-col{ order:1; }
+}
+
+/* ---------- điện thoại (iPhone 13/14 ~390px) ---------- */
+@media (max-width:560px){
+  .wrap{ padding:12px 12px 50px; }
+  .layout{ gap:16px; }
+  .topbar{ margin-bottom:10px; }
+  .brand h1{ font-size:21px; }
+  .brand svg{ width:20px; height:20px; }
+  .greeting{ font-size:13.5px; margin-bottom:12px; }
+  .whoami{ font-size:12.5px; }
+
+  /* font-size >=16px để iOS Safari không tự zoom khi chạm vào ô nhập */
+  .f-input, .search input, .composer-body textarea, .edit-body textarea,
+  .idea-form input, .fun-guess-row input, .add-inline input{ font-size:16px; }
+
+  .composer{ margin-bottom:14px; }
+  .composer-head{ padding:11px 13px; font-size:14px; }
+  .composer-body{ padding:0 13px 14px; }
+  .seg{ grid-template-columns:1fr 1fr; }
+  .composer-actions button{ padding:10px 16px; }
+
+  .urgent-section{ margin-bottom:16px; }
+  .urgent-track .card{ min-width:186px; max-width:186px; }
+
+  /* toolbar: ô tìm chiếm cả hàng, chip lọc vuốt ngang */
+  .toolbar{ gap:8px; }
+  .search{ flex-basis:100%; }
+  .filter-chips{
+    width:100%; flex-wrap:nowrap; overflow-x:auto; padding-bottom:4px;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .filter-chips::-webkit-scrollbar{ display:none; }
+  .fchip{ white-space:nowrap; flex-shrink:0; padding:8px 13px; }
+
+  .board{ gap:12px; }
+  .card .actions button{ font-size:14px; padding:4px 6px; }
+  .star-ico{ font-size:16px; }
+  .vote-btn{ width:30px; height:24px; font-size:12px; }
+
+  .view-modal{ max-width:none; max-height:92vh; padding:20px 16px 16px; }
+  .view-overlay{ padding:12px; }
+  .vm-row .vm-label{ width:76px; }
+
+  .toast{ bottom:14px; width:max-content; }
 }
