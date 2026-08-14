@@ -45,6 +45,16 @@ create table if not exists public.pins (
   updated_at timestamptz
 );
 
+-- Ý tưởng / feedback: vote ▲▼, ý tưởng nhiều vote nhất được phát triển
+create table if not exists public.ideas (
+  id text primary key default gen_random_uuid()::text,
+  content text not null,
+  author text not null,
+  up_voters text[] not null default '{}',
+  down_voters text[] not null default '{}',
+  created_at timestamptz not null default now()
+);
+
 -- Nâng cấp cho database đã tạo từ trước (chạy lại file này là đủ)
 alter table public.pins add column if not exists done boolean not null default false;
 
@@ -90,6 +100,11 @@ drop policy if exists "anon full access members" on public.members;
 create policy "anon full access members" on public.members
   for all using (true) with check (true);
 
+alter table public.ideas enable row level security;
+drop policy if exists "anon full access ideas" on public.ideas;
+create policy "anon full access ideas" on public.ideas
+  for all using (true) with check (true);
+
 -- Bật realtime để mọi người thấy thay đổi ngay (bỏ qua nếu đã bật)
 do $$ begin
   alter publication supabase_realtime add table public.pins;
@@ -102,4 +117,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table public.members;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.ideas;
 exception when duplicate_object then null; end $$;

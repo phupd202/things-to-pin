@@ -24,6 +24,22 @@
 
   function uid(){ return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
+  // 1 người 1 vote: bấm lại để bỏ vote, đổi chiều thì chuyển vote
+  function applyVote(idea, voter, dir){
+    const up = new Set(idea.upVoters || []);
+    const down = new Set(idea.downVoters || []);
+    if(dir === 'up'){
+      if(up.has(voter)) up.delete(voter);
+      else { up.add(voter); down.delete(voter); }
+    } else {
+      if(down.has(voter)) down.delete(voter);
+      else { down.add(voter); up.delete(voter); }
+    }
+    idea.upVoters = [...up];
+    idea.downVoters = [...down];
+    return idea;
+  }
+
   /* ---------- localStorage backend ---------- */
   function lsLoad(){
     try{
@@ -31,10 +47,11 @@
       if(raw){
         const data = JSON.parse(raw);
         if(!data.members) data.members = [];
+        if(!data.ideas) data.ideas = [];
         return data;
       }
     }catch(e){}
-    return {pins:[], collections:[...DEFAULT_COLLECTIONS], teams:[...DEFAULT_TEAMS], members:[]};
+    return {pins:[], collections:[...DEFAULT_COLLECTIONS], teams:[...DEFAULT_TEAMS], members:[], ideas:[]};
   }
   function lsSave(data){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
 
@@ -84,6 +101,21 @@
       lsSave(data);
       return member;
     },
+    async addIdea(idea){
+      const data = lsLoad();
+      const row = {id: uid(), content: idea.content, author: idea.author, createdAt: new Date().toISOString(), upVoters: [], downVoters: []};
+      data.ideas.push(row);
+      lsSave(data);
+      return row;
+    },
+    async voteIdea(id, voter, dir){
+      const data = lsLoad();
+      const idea = data.ideas.find(x => x.id === id);
+      if(!idea) return null;
+      applyVote(idea, voter, dir);
+      lsSave(data);
+      return idea;
+    },
     onChange(){ /* không có realtime ở chế độ cục bộ */ }
   };
 
@@ -109,6 +141,16 @@
         updatedAt: r.updated_at || null
       };
     }
+    function ideaFromRow(r){
+      return {
+        id: r.id,
+        content: r.content,
+        author: r.author,
+        createdAt: r.created_at,
+        upVoters: r.up_voters || [],
+        downVoters: r.down_voters || []
+      };
+    }
     function pinToRow(p){
       const row = {};
       if('content' in p) row.content = p.content;
@@ -128,21 +170,24 @@
     return {
       mode: 'supabase',
       async fetchAll(){
-        const [pinsRes, collRes, teamRes, memberRes] = await Promise.all([
+        const [pinsRes, collRes, teamRes, memberRes, ideaRes] = await Promise.all([
           client.from('pins').select('*').order('created_at', {ascending:false}),
           client.from('collections').select('*').order('created_at', {ascending:true}),
           client.from('teams').select('*').order('created_at', {ascending:true}),
-          client.from('members').select('*').order('display_name', {ascending:true})
+          client.from('members').select('*').order('display_name', {ascending:true}),
+          client.from('ideas').select('*').order('created_at', {ascending:true})
         ]);
         if(pinsRes.error) throw pinsRes.error;
         if(collRes.error) throw collRes.error;
         if(teamRes.error) throw teamRes.error;
         if(memberRes.error) throw memberRes.error;
+        if(ideaRes.error) throw ideaRes.error;
         return {
           pins: pinsRes.data.map(pinFromRow),
           collections: collRes.data.map(r => ({id:r.id, label:r.label, bg:r.bg, ink:r.ink})),
           teams: teamRes.data.map(r => r.name),
-          members: memberRes.data.map(r => ({displayName:r.display_name, fullName:r.full_name, team:r.team}))
+          members: memberRes.data.map(r => ({displayName:r.display_name, fullName:r.full_name, team:r.team})),
+          ideas: ideaRes.data.map(ideaFromRow)
         };
       },
       async createPin(pin){
@@ -183,12 +228,29 @@
         if(error) throw error;
         return member;
       },
+      async addIdea(idea){
+        const {data, error} = await client.from('ideas')
+          .insert({content: idea.content, author: idea.author}).select().single();
+        if(error) throw error;
+        return ideaFromRow(data);
+      },
+      async voteIdea(id, voter, dir){
+        const {data: row, error: readErr} = await client.from('ideas').select('*').eq('id', id).single();
+        if(readErr) throw readErr;
+        const idea = applyVote(ideaFromRow(row), voter, dir);
+        const {data, error} = await client.from('ideas')
+          .update({up_voters: idea.upVoters, down_voters: idea.downVoters})
+          .eq('id', id).select().single();
+        if(error) throw error;
+        return ideaFromRow(data);
+      },
       onChange(cb){
         client.channel('ttp-changes')
           .on('postgres_changes', {event:'*', schema:'public', table:'pins'}, cb)
           .on('postgres_changes', {event:'*', schema:'public', table:'collections'}, cb)
           .on('postgres_changes', {event:'*', schema:'public', table:'teams'}, cb)
           .on('postgres_changes', {event:'*', schema:'public', table:'members'}, cb)
+          .on('postgres_changes', {event:'*', schema:'public', table:'ideas'}, cb)
           .subscribe();
       }
     };
