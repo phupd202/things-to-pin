@@ -571,9 +571,6 @@
   /* ---------- init ---------- */
   (async function init(){
     document.getElementById('modeBadge').textContent = Store.mode === 'local' ? 'chế độ cục bộ' : '';
-    document.getElementById('footerNote').textContent = Store.mode === 'local'
-      ? '⚠️ Chưa cấu hình Supabase — dữ liệu chỉ lưu trên trình duyệt này (localStorage).'
-      : '📌 Things to Pin — bảng ghim chung của phòng';
 
     try{
       await reload();
