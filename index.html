@@ -14,19 +14,42 @@
 
 <div class="wrap">
   <div class="layout">
-    <div class="sidebar" id="sidebar">
-      <h2>🔥 Tải việc theo tổ</h2>
-      <p class="sub">Số pin đang gán cho từng tổ, theo mức độ ưu tiên. Bấm 1 tổ để lọc bảng ghim.</p>
-      <div id="heatFilterNote"></div>
-      <div class="heat-head">
-        <span></span>
-        <span title="Thượng thượng khẩn">TTK</span>
-        <span title="Thượng khẩn">TK</span>
-        <span title="Khẩn">K</span>
-        <span title="Bình thường">BT</span>
-        <span title="Tổng số">Σ</span>
+    <div class="side-col">
+      <div class="sidebar" id="sidebar">
+        <h2>🔥 Tải việc theo tổ</h2>
+        <p class="sub">Số pin đang gán cho từng tổ, theo mức độ ưu tiên. Bấm 1 tổ để lọc bảng ghim.</p>
+        <div id="heatFilterNote"></div>
+        <div class="heat-head">
+          <span></span>
+          <span title="Thượng thượng khẩn">TTK</span>
+          <span title="Thượng khẩn">TK</span>
+          <span title="Khẩn">K</span>
+          <span title="Bình thường">BT</span>
+          <span title="Tổng số">Σ</span>
+        </div>
+        <div id="heatBody"></div>
       </div>
-      <div id="heatBody"></div>
+
+      <div class="fun-card">
+        <h2>🌟 Gợi ý hôm nay</h2>
+        <p class="sub">Mỗi ngày một câu — cả phòng cùng thấy.</p>
+        <div id="dailyBody"></div>
+      </div>
+
+      <div class="fun-card">
+        <h2>🧩 Nghỉ 5 phút</h2>
+        <p class="sub">Câu đố, nhắc nghỉ và game nhỏ giải lao.</p>
+        <div class="fun-section" id="funQuiz"></div>
+        <div class="fun-section" id="funReminder"></div>
+        <div class="fun-section">
+          <div class="game-tabs" id="gameTabs">
+            <button data-g="guess">🎯 Đoán số</button>
+            <button data-g="simon">🎨 Simon</button>
+            <button data-g="puzzle">🔢 Xếp số</button>
+          </div>
+          <div id="gameBody"></div>
+        </div>
+      </div>
     </div>
 
     <div class="main-col">
@@ -130,5 +153,7 @@
 <script src="js/config.js"></script>
 <script src="js/store.js"></script>
 <script src="js/app.js"></script>
+<script src="js/fun-data.js"></script>
+<script src="js/fun.js"></script>
 </body>
 </html>
