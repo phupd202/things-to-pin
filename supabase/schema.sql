@@ -18,6 +18,15 @@ create table if not exists public.teams (
   created_at timestamptz not null default now()
 );
 
+-- Thành viên: lưu khi vào web lần đầu để đối chiếu ai là ai
+create table if not exists public.members (
+  display_name text primary key,   -- ví dụ: AnNV
+  full_name text not null,         -- ví dụ: Nguyễn Văn An
+  team text not null,
+  created_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now()
+);
+
 -- Pin: nội dung + link + deadline + thành phần tham gia + độ ưu tiên
 create table if not exists public.pins (
   id text primary key default gen_random_uuid()::text,
@@ -46,7 +55,12 @@ insert into public.collections (id, label, bg, ink) values
 on conflict (id) do nothing;
 
 insert into public.teams (name) values
-  ('Tổ ATTT'), ('Tổ CLM'), ('Tổ ATP'), ('Ban 1'), ('Ban Đầu tư'), ('KT'), ('Cả phòng')
+  ('Nhóm Điều hành và Quản lý vận hành'),
+  ('Nhóm Quản lý mạng lõi'),
+  ('Nhóm Quản lý hạ tầng CNTT'),
+  ('Nhóm Quản lý CSHT và đầu tư'),
+  ('Nhóm Quản lý chất lượng'),
+  ('Nhóm Điều hành dịch vụ')
 on conflict (name) do nothing;
 
 -- RLS: Phase 1 chưa có login — mở cho anon (nội bộ phòng).
@@ -54,6 +68,7 @@ on conflict (name) do nothing;
 alter table public.pins enable row level security;
 alter table public.collections enable row level security;
 alter table public.teams enable row level security;
+alter table public.members enable row level security;
 
 drop policy if exists "anon full access pins" on public.pins;
 create policy "anon full access pins" on public.pins
@@ -65,6 +80,10 @@ create policy "anon full access collections" on public.collections
 
 drop policy if exists "anon full access teams" on public.teams;
 create policy "anon full access teams" on public.teams
+  for all using (true) with check (true);
+
+drop policy if exists "anon full access members" on public.members;
+create policy "anon full access members" on public.members
   for all using (true) with check (true);
 
 -- Bật realtime để mọi người thấy thay đổi ngay

@@ -9,7 +9,14 @@
     {id:'taily', label:'Tài liệu', bg:'#CFE6FF', ink:'#1B4E82'},
     {id:'link', label:'Link / Slide', bg:'#E5DEFF', ink:'#4A3A8A'}
   ];
-  const DEFAULT_TEAMS = ['Tổ ATTT','Tổ CLM','Tổ ATP','Ban 1','Ban Đầu tư','KT','Cả phòng'];
+  const DEFAULT_TEAMS = [
+    'Nhóm Điều hành và Quản lý vận hành',
+    'Nhóm Quản lý mạng lõi',
+    'Nhóm Quản lý hạ tầng CNTT',
+    'Nhóm Quản lý CSHT và đầu tư',
+    'Nhóm Quản lý chất lượng',
+    'Nhóm Điều hành dịch vụ'
+  ];
   const NEW_COLL_PALETTE = [
     {bg:'#D9F0DC', ink:'#2C6B3F'}, {bg:'#FFE1EC', ink:'#8A3357'}, {bg:'#E4F0FF', ink:'#2A5D8A'},
     {bg:'#FFF0C7', ink:'#8A6A17'}, {bg:'#E8E3FF', ink:'#4E3F91'}
@@ -21,9 +28,13 @@
   function lsLoad(){
     try{
       const raw = localStorage.getItem(LS_KEY);
-      if(raw) return JSON.parse(raw);
+      if(raw){
+        const data = JSON.parse(raw);
+        if(!data.members) data.members = [];
+        return data;
+      }
     }catch(e){}
-    return {pins:[], collections:[...DEFAULT_COLLECTIONS], teams:[...DEFAULT_TEAMS]};
+    return {pins:[], collections:[...DEFAULT_COLLECTIONS], teams:[...DEFAULT_TEAMS], members:[]};
   }
   function lsSave(data){ localStorage.setItem(LS_KEY, JSON.stringify(data)); }
 
@@ -64,6 +75,14 @@
       const data = lsLoad();
       if(!data.teams.includes(name)){ data.teams.push(name); lsSave(data); }
       return name;
+    },
+    async saveMember(member){
+      const data = lsLoad();
+      const i = data.members.findIndex(m => m.displayName === member.displayName);
+      if(i >= 0) data.members[i] = {...data.members[i], ...member};
+      else data.members.push({...member, createdAt: new Date().toISOString()});
+      lsSave(data);
+      return member;
     },
     onChange(){ /* không có realtime ở chế độ cục bộ */ }
   };
@@ -148,6 +167,16 @@
         const {error} = await client.from('teams').upsert({name}, {onConflict:'name', ignoreDuplicates:true});
         if(error) throw error;
         return name;
+      },
+      async saveMember(member){
+        const {error} = await client.from('members').upsert({
+          display_name: member.displayName,
+          full_name: member.fullName,
+          team: member.team,
+          last_seen_at: new Date().toISOString()
+        }, {onConflict:'display_name'});
+        if(error) throw error;
+        return member;
       },
       onChange(cb){
         client.channel('ttp-changes')

@@ -91,34 +91,69 @@
   function saveUser(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); }
   function renderTeamList(){
     document.getElementById('teamList').innerHTML = TEAMS.map(t => `<option value="${esc(t)}">`).join('');
+    const sel = document.getElementById('gTeam');
+    const current = sel.value;
+    sel.innerHTML = `<option value="" disabled ${current?'':'selected'}>— Chọn tổ chuyên môn —</option>`
+      + TEAMS.map(t => `<option value="${esc(t)}" ${t===current?'selected':''}>${esc(t)}</option>`).join('');
   }
+
+  // "Nguyễn Văn An" → "AnNV": tên + chữ cái đầu của họ và tên đệm
+  function makeDisplayName(fullName){
+    const words = fullName.trim().split(/\s+/);
+    if(words.length < 2) return words[0] || '';
+    const last = words[words.length-1];
+    const initials = words.slice(0, -1).map(w => w[0].toUpperCase()).join('');
+    return last.charAt(0).toUpperCase() + last.slice(1) + initials;
+  }
+
+  document.getElementById('gName').addEventListener('input', (e) => {
+    const v = e.target.value.trim();
+    const hint = document.getElementById('gNameHint');
+    hint.innerHTML = v.split(/\s+/).filter(Boolean).length >= 2
+      ? `Tên hiển thị: <b>${esc(makeDisplayName(v))}</b>` : '';
+  });
+
   document.getElementById('gEnter').addEventListener('click', async () => {
     const name = document.getElementById('gName').value.trim();
-    const team = document.getElementById('gTeam').value.trim();
-    if(!name){ document.getElementById('gName').focus(); return; }
-    user = {name, team: team || 'Chưa rõ tổ'};
+    const team = document.getElementById('gTeam').value;
+    const errEl = document.getElementById('gError');
+    if(name.split(/\s+/).filter(Boolean).length < 2){
+      errEl.textContent = 'Nhập tên đầy đủ (ví dụ: Nguyễn Văn An).';
+      document.getElementById('gName').focus();
+      return;
+    }
+    if(!team){
+      errEl.textContent = 'Chọn tổ chuyên môn của bạn.';
+      document.getElementById('gTeam').focus();
+      return;
+    }
+    errEl.textContent = '';
+    const display = makeDisplayName(name);
+    user = {name, display, team};
     saveUser(user);
+    try{
+      await Store.saveMember({fullName: name, displayName: display, team});
+    }catch(e){ fail(e, 'Không lưu được thông tin thành viên lên server.'); }
     gate.style.display = 'none';
     renderWhoami();
-    if(team && !TEAMS.includes(team)){
-      try{ await Store.addTeam(team); TEAMS.push(team); renderTeamList(); }catch(e){ fail(e); }
-    }
     render();
   });
 
   function renderWhoami(){
     if(!user) return;
     document.getElementById('whoami').innerHTML = `
-      <div class="avatar" style="background:${avatarColor(user.name)}">${initials(user.name)}</div>
-      <div class="txt"><b>${esc(user.name)}</b><span>${esc(user.team)}</span></div>
+      <div class="avatar" style="background:${avatarColor(user.display)}" title="${esc(user.name)}">${initials(user.name)}</div>
+      <div class="txt"><b title="${esc(user.name)}">${esc(user.display)}</b><span>${esc(user.team)}</span></div>
       <button id="editWho">đổi</button>
     `;
     document.getElementById('editWho').addEventListener('click', () => {
       document.getElementById('gName').value = user.name;
-      document.getElementById('gTeam').value = user.team === 'Chưa rõ tổ' ? '' : user.team;
+      document.getElementById('gTeam').value = TEAMS.includes(user.team) ? user.team : '';
+      renderTeamList();
+      document.getElementById('gName').dispatchEvent(new Event('input'));
       gate.style.display = 'flex';
     });
-    document.getElementById('greetingLine').innerHTML = `Chào <b>${esc(user.name)}</b> 👋 — đây là mọi thứ phòng đang cần đọc, cần làm hôm nay.`;
+    document.getElementById('greetingLine').innerHTML = `Chào <b>${esc(user.display)}</b> 👋 — đây là mọi thứ phòng đang cần đọc, cần làm hôm nay.`;
   }
 
   /* ---------- composer ---------- */
@@ -234,7 +269,7 @@
         priority: composerPriority,
         collection: composerColl,
         starred: document.getElementById('cStar').checked,
-        author: user ? user.name : 'ẩn danh',
+        author: user ? user.display : 'ẩn danh',
         authorTeam: user ? user.team : ''
       });
       pins.unshift(pin);
@@ -335,7 +370,7 @@
     const p = pins.find(x => x.id === id);
     if(!p) return;
     try{
-      const updated = await Store.updatePin(id, {starred: !p.starred, updatedBy: user ? user.name : 'ẩn danh'});
+      const updated = await Store.updatePin(id, {starred: !p.starred, updatedBy: user ? user.display : 'ẩn danh'});
       Object.assign(p, updated);
       render();
     }catch(e){ fail(e); }
@@ -356,7 +391,7 @@
       url: document.getElementById('eUrl').value.trim(),
       deadline: document.getElementById('eDeadline').value,
       people: document.getElementById('ePeople').value.split(',').map(s=>s.trim()).filter(Boolean),
-      updatedBy: user ? user.name : 'ẩn danh'
+      updatedBy: user ? user.display : 'ẩn danh'
     };
     try{
       for(const t of fields.people){
@@ -547,10 +582,16 @@
     }
 
     user = loadUser();
-    if(user){
+    if(user && user.display && TEAMS.includes(user.team)){
       renderWhoami();
+      // đối chiếu: đảm bảo thành viên có trong database
+      Store.saveMember({fullName: user.name, displayName: user.display, team: user.team}).catch(console.error);
       render();
     } else {
+      if(user){
+        document.getElementById('gName').value = user.name || '';
+        document.getElementById('gName').dispatchEvent(new Event('input'));
+      }
       gate.style.display = 'flex';
     }
 

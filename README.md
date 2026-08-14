@@ -11,7 +11,7 @@ Bảng ghim chung của phòng — thay cho việc pin nhiều nội dung trên 
 - Dải **"Cần chú ý ngay"**: ghim nổi (⭐), pin quá hạn, deadline hôm nay và trong 3 ngày tới.
 - Ghim nổi (⭐) đưa pin quan trọng lên đầu bảng.
 - Search + filter theo nhóm, deadline, ghim nổi; lọc theo tổ qua heatmap bên trái.
-- Lần đầu vào web: nhập tên + tổ chuyên môn → lưu localStorage.
+- Lần đầu vào web: nhập tên đầy đủ (ví dụ *Nguyễn Văn An*) + chọn 1 trong 6 tổ chuyên môn → tên hiển thị dạng **AnNV**, lưu localStorage và bảng `members` trên database để đối chiếu.
 - Minh bạch: ghi nhận ai tạo, ai sửa lần cuối, lúc nào.
 - Realtime: ai đó ghim/sửa là mọi người thấy ngay (khi dùng Supabase).
 
