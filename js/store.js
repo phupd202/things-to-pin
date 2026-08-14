@@ -99,6 +99,7 @@
         deadline: r.deadline || '',
         people: r.people || [],
         priority: r.priority,
+        done: !!r.done,
         collection: r.collection_id,
         starred: !!r.starred,
         author: r.created_by,
@@ -117,6 +118,7 @@
       if('priority' in p) row.priority = p.priority;
       if('collection' in p) row.collection_id = p.collection;
       if('starred' in p) row.starred = !!p.starred;
+      if('done' in p) row.done = !!p.done;
       if('author' in p) row.created_by = p.author;
       if('authorTeam' in p) row.created_by_team = p.authorTeam || null;
       if('updatedBy' in p) row.updated_by = p.updatedBy;
@@ -126,18 +128,21 @@
     return {
       mode: 'supabase',
       async fetchAll(){
-        const [pinsRes, collRes, teamRes] = await Promise.all([
+        const [pinsRes, collRes, teamRes, memberRes] = await Promise.all([
           client.from('pins').select('*').order('created_at', {ascending:false}),
           client.from('collections').select('*').order('created_at', {ascending:true}),
-          client.from('teams').select('*').order('created_at', {ascending:true})
+          client.from('teams').select('*').order('created_at', {ascending:true}),
+          client.from('members').select('*').order('display_name', {ascending:true})
         ]);
         if(pinsRes.error) throw pinsRes.error;
         if(collRes.error) throw collRes.error;
         if(teamRes.error) throw teamRes.error;
+        if(memberRes.error) throw memberRes.error;
         return {
           pins: pinsRes.data.map(pinFromRow),
           collections: collRes.data.map(r => ({id:r.id, label:r.label, bg:r.bg, ink:r.ink})),
-          teams: teamRes.data.map(r => r.name)
+          teams: teamRes.data.map(r => r.name),
+          members: memberRes.data.map(r => ({displayName:r.display_name, fullName:r.full_name, team:r.team}))
         };
       },
       async createPin(pin){
@@ -183,6 +188,7 @@
           .on('postgres_changes', {event:'*', schema:'public', table:'pins'}, cb)
           .on('postgres_changes', {event:'*', schema:'public', table:'collections'}, cb)
           .on('postgres_changes', {event:'*', schema:'public', table:'teams'}, cb)
+          .on('postgres_changes', {event:'*', schema:'public', table:'members'}, cb)
           .subscribe();
       }
     };

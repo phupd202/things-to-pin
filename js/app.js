@@ -3,6 +3,7 @@
 
   let COLLECTIONS = [];
   let TEAMS = [];
+  let MEMBERS = [];
   let pins = [];
 
   let user = null;
@@ -34,6 +35,10 @@
   function avatarColor(name){
     let h=0; for(const c of (name||'')) h = (h*31 + c.charCodeAt(0)) % AVATAR_COLORS.length;
     return AVATAR_COLORS[h];
+  }
+  function personTitle(n){
+    const m = MEMBERS.find(x => x.displayName === n);
+    return m ? `${m.fullName} — ${m.team}` : n;
   }
   function esc(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
   function fmtDate(iso){
@@ -90,7 +95,9 @@
   }
   function saveUser(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); }
   function renderTeamList(){
-    document.getElementById('teamList').innerHTML = TEAMS.map(t => `<option value="${esc(t)}">`).join('');
+    document.getElementById('teamList').innerHTML =
+      TEAMS.map(t => `<option value="${esc(t)}">`).join('')
+      + MEMBERS.map(m => `<option value="${esc(m.displayName)}">`).join('');
     const sel = document.getElementById('gTeam');
     const current = sel.value;
     sel.innerHTML = `<option value="" disabled ${current?'':'selected'}>— Chọn tổ chuyên môn —</option>`
@@ -214,7 +221,13 @@
     const adder = addingTeam
       ? `<span class="add-inline"><input id="newTeamInput" placeholder="Tên tổ mới..."><button id="newTeamConfirm">✓</button></span>`
       : `<span class="add-chip" id="addTeamBtn">+ Tổ mới</span>`;
-    document.getElementById('cPeopleChips').innerHTML = chips + adder;
+    const memberChips = MEMBERS.length
+      ? `<span class="chip-group-label">Người:</span>` + MEMBERS.map(m =>
+          `<span class="team-chip person ${composerPeople.includes(m.displayName)?'on':''}" data-t="${esc(m.displayName)}" title="${esc(m.fullName)} — ${esc(m.team)}"><span class="chip-av" style="background:${avatarColor(m.displayName)}">${initials(m.displayName)}</span>${esc(m.displayName)}</span>`
+        ).join('')
+      : `<span class="chip-group-label" style="opacity:.6">Chưa có ai vào web — mỗi người vào lần đầu sẽ tự xuất hiện ở đây để gán việc.</span>`;
+    document.getElementById('cPeopleChips').innerHTML =
+      `<span class="chip-group-label">Tổ:</span>` + chips + adder + `<span class="chip-break"></span>` + memberChips;
     document.querySelectorAll('#cPeopleChips .team-chip').forEach(el => {
       el.addEventListener('click', () => {
         const t = el.dataset.t;
@@ -284,7 +297,7 @@
   /* ---------- filters ---------- */
   document.getElementById('searchInput').addEventListener('input', (e) => { search = e.target.value; render(); });
   function renderFilterChips(){
-    const items = [{id:'all', label:'Tất cả'}, ...COLLECTIONS.map(c=>({id:c.id, label:c.label})), {id:'deadline', label:'Có deadline'}, {id:'starred', label:'⭐ Ghim nổi'}];
+    const items = [{id:'all', label:'Tất cả'}, {id:'mine', label:'🙋 Của tôi'}, ...COLLECTIONS.map(c=>({id:c.id, label:c.label})), {id:'deadline', label:'Có deadline'}, {id:'starred', label:'⭐ Ghim nổi'}, {id:'done', label:'✅ Đã xong'}];
     document.getElementById('filterChips').innerHTML = items.map(it =>
       `<span class="fchip ${activeFilter===it.id?'active':''}" data-id="${it.id}">${esc(it.label)}</span>`
     ).join('');
@@ -296,13 +309,14 @@
   /* ---------- card rendering ---------- */
   const PRANK = {ttkhan:0, tkhan:1, khan:2, bt:3};
   function isUrgent(p){
+    if(p.done) return false;
     const u = urgency(p.deadline);
     return p.starred || u === 'overdue' || u === 'today' || u === 'soon';
   }
   function sortKey(p){
     const u = urgency(p.deadline);
     const uRank = {overdue:0, today:1, soon:2, later:3, none:4}[u];
-    return (p.starred ? 0 : 100) + uRank*10 + PRANK[p.priority];
+    return (p.done ? 1000 : 0) + (p.starred ? 0 : 100) + uRank*10 + PRANK[p.priority];
   }
   function createdMs(p){ return new Date(p.createdAt).getTime() || 0; }
 
@@ -321,13 +335,13 @@
     const star = `<span class="star-ico ${p.starred?'':'off'}" data-act="star" data-id="${p.id}" title="${p.starred?'Bỏ ghim nổi':'Ghim nổi lên đầu'}">⭐</span>`;
     const prioDot = `<span class="prio-dot" style="background:${pm.color}" title="${esc(pm.label)}"></span>`;
     const peopleHTML = p.people && p.people.length
-      ? `<div class="people">${p.people.slice(0,4).map(n => `<span class="av" style="background:${avatarColor(n)}" title="${esc(n)}">${initials(n)}</span>`).join('')}${p.people.length>4?`<span class="av" style="background:#9AA1AC">+${p.people.length-4}</span>`:''}</div>`
+      ? `<div class="people">${p.people.slice(0,4).map(n => `<span class="av" style="background:${avatarColor(n)}" title="${esc(personTitle(n))}">${initials(n)}</span>`).join('')}${p.people.length>4?`<span class="av" style="background:#9AA1AC">+${p.people.length-4}</span>`:''}</div>`
       : '';
     const deadlineHTML = p.deadline
       ? `<span class="deadline-badge" style="background:${um.color}">🗓 ${um.label ? um.label+' · ' : ''}${fmtDate(p.deadline)}</span><br>`
       : '';
     return `
-      <div class="card ${p.starred?'starred':''}" style="background:${coll.bg}; transform:rotate(${rotate}deg)" data-id="${p.id}">
+      <div class="card ${p.starred?'starred':''} ${p.done?'done':''}" style="background:${coll.bg}; transform:rotate(${rotate}deg)" data-id="${p.id}">
         <svg class="clip" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.7 2 6 4.7 6 8c0 4.2 6 12 6 12s6-7.8 6-12c0-3.3-2.7-6-6-6z" fill="${um.color || '#B9B29A'}"/><circle cx="12" cy="8" r="2.6" fill="#fff"/></svg>
         <div class="card-top">
           <span class="coll-tag" style="background:rgba(255,255,255,.55);color:${coll.ink}">${esc(coll.label)}</span>
@@ -340,6 +354,7 @@
         <div class="meta">
           <span>${auditLine(p)}</span>
           <div class="actions">
+            <button data-act="done" data-id="${p.id}" title="${p.done?'Mở lại':'Đánh dấu đã xong'}">${p.done?'↩':'✓'}</button>
             <button data-act="edit" data-id="${p.id}" title="Sửa">✎</button>
             <button data-act="del" data-id="${p.id}" title="Bỏ ghim">✕</button>
           </div>
@@ -375,6 +390,25 @@
       render();
     }catch(e){ fail(e); }
   }
+  async function toggleDone(id){
+    const p = pins.find(x => x.id === id);
+    if(!p) return;
+    try{
+      const updated = await Store.updatePin(id, {done: !p.done, updatedBy: user ? user.display : 'ẩn danh'});
+      Object.assign(p, updated);
+      render();
+      toast(p.done ? '✅ Đã xong!' : 'Đã mở lại pin.');
+    }catch(e){ fail(e); }
+  }
+  function pinLink(id){ return location.origin + location.pathname + '?pin=' + encodeURIComponent(id); }
+  async function copyPinLink(id){
+    try{
+      await navigator.clipboard.writeText(pinLink(id));
+      toast('🔗 Đã chép link pin — dán vào chat để gửi.');
+    }catch(e){
+      prompt('Chép link này:', pinLink(id));
+    }
+  }
   async function deletePin(id){
     try{
       await Store.deletePin(id);
@@ -394,10 +428,13 @@
       updatedBy: user ? user.display : 'ẩn danh'
     };
     try{
-      for(const t of fields.people){
-        if(!TEAMS.includes(t)){ await Store.addTeam(t); TEAMS.push(t); }
+      // Chỉ gán tổ hoặc người đã có trong danh sách thành viên
+      const known = new Set([...TEAMS, ...MEMBERS.map(m => m.displayName)]);
+      const unknown = fields.people.filter(x => !known.has(x));
+      if(unknown.length){
+        toast('Bỏ qua “' + unknown.join(', ') + '” — chỉ gán được tổ hoặc người đã vào web.');
+        fields.people = fields.people.filter(x => known.has(x));
       }
-      renderTeamList();
       const updated = await Store.updatePin(id, fields);
       Object.assign(p, updated);
       editingId = null;
@@ -413,6 +450,7 @@
         const act = el.dataset.act;
         if(act === 'del'){ deletePin(id); }
         else if(act === 'star'){ toggleStar(id); }
+        else if(act === 'done'){ toggleDone(id); }
         else if(act === 'edit'){ editingId = id; render(); }
         else if(act === 'cancel-edit'){ editingId = null; render(); }
         else if(act === 'save-edit'){ saveEdit(id); }
@@ -431,7 +469,7 @@
     const u = urgency(p.deadline);
     const um = URG_META[u];
     const peopleHTML = p.people && p.people.length
-      ? p.people.map(n => `<span><span class="av" style="background:${avatarColor(n)}">${initials(n)}</span>${esc(n)}</span>`).join('')
+      ? p.people.map(n => `<span title="${esc(personTitle(n))}"><span class="av" style="background:${avatarColor(n)}">${initials(n)}</span>${esc(n)}</span>`).join('')
       : '<span style="opacity:.55">Chưa gán ai</span>';
     const editedLine = p.updatedAt ? ` · sửa lần cuối bởi ${esc(p.updatedBy || p.author)}, ${timeAgo(p.updatedAt)}` : '';
     const modal = document.getElementById('viewModal');
@@ -453,6 +491,8 @@
       <div class="vm-meta">Tạo bởi ${esc(p.author)}${p.authorTeam ? ' ('+esc(p.authorTeam)+')' : ''} · ${timeAgo(p.createdAt)}${editedLine}</div>
       <div class="vm-actions">
         <button class="btn-ghost" id="vmDelete">Bỏ ghim</button>
+        <button class="btn-ghost" id="vmCopy" title="Chép link trực tiếp tới pin này">🔗 Chép link</button>
+        <button class="btn-ghost" id="vmDone">${p.done ? '↩ Mở lại' : '✓ Đã xong'}</button>
         <button class="btn-ghost" id="vmStar">${p.starred ? '⭐ Bỏ ghim nổi' : '☆ Ghim nổi'}</button>
         <button class="btn-solid" id="vmEdit">✎ Sửa</button>
       </div>
@@ -461,6 +501,8 @@
     document.getElementById('vmClose').addEventListener('click', closeView);
     document.getElementById('vmEdit').addEventListener('click', () => { closeView(); editingId = id; render(); });
     document.getElementById('vmStar').addEventListener('click', () => { closeView(); toggleStar(id); });
+    document.getElementById('vmDone').addEventListener('click', () => { closeView(); toggleDone(id); });
+    document.getElementById('vmCopy').addEventListener('click', () => copyPinLink(id));
     document.getElementById('vmDelete').addEventListener('click', () => { closeView(); deletePin(id); });
   }
   function closeView(){ document.getElementById('viewOverlay').classList.remove('open'); }
@@ -470,6 +512,8 @@
     if(activeFilter === 'all') return true;
     if(activeFilter === 'deadline') return !!p.deadline;
     if(activeFilter === 'starred') return !!p.starred;
+    if(activeFilter === 'done') return !!p.done;
+    if(activeFilter === 'mine') return !!user && ((p.people||[]).includes(user.display) || (p.people||[]).includes(user.team) || p.author === user.display);
     return p.collection === activeFilter;
   }
   function matchesTeam(p){
@@ -559,6 +603,7 @@
     pins = data.pins;
     COLLECTIONS = data.collections;
     TEAMS = data.teams;
+    MEMBERS = data.members || [];
     if(!COLLECTIONS.find(c => c.id === composerColl)){
       composerColl = COLLECTIONS[0] ? COLLECTIONS[0].id : 'viec';
     }
@@ -591,6 +636,10 @@
       }
       gate.style.display = 'flex';
     }
+
+    // deep link: mở thẳng pin được chia sẻ qua ?pin=<id>
+    const linkedPin = new URLSearchParams(location.search).get('pin');
+    if(linkedPin && pins.some(p => p.id === linkedPin)) openView(linkedPin);
 
     // realtime: khi ai đó thay đổi dữ liệu, tự tải lại
     let reloadTimer = null;
