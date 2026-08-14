@@ -37,6 +37,8 @@ window.APP_CONFIG = {
 };
 ```
 
+> Không muốn commit key lên GitHub? Khi deploy Vercel có thể dùng biến môi trường thay thế — xem mục Deploy Vercel bên dưới. (Lưu ý: anon key là khóa public phía client, ai mở web cũng tải được nó trong JS; bảo mật thật sự nằm ở RLS/policy phía Supabase.)
+
 > Chưa cấu hình Supabase? App vẫn chạy được ở **chế độ cục bộ** (localStorage) — dữ liệu chỉ lưu trên trình duyệt của từng người, phù hợp để xem thử giao diện.
 
 ### 2. Chạy local
@@ -52,11 +54,13 @@ Mở http://localhost:8080
 
 ### 3. Deploy Vercel
 
-```bash
-npx vercel --prod
-```
+1. Import repo này trên [vercel.com/new](https://vercel.com/new) (hoặc chạy `npx vercel --prod`).
+2. Để không phải commit key: vào **Project → Settings → Environment Variables**, thêm:
+   - `SUPABASE_URL` = Project URL
+   - `SUPABASE_ANON_KEY` = anon public key
+3. Redeploy. Lúc build, `scripts/build-config.js` tự sinh `js/config.js` từ 2 biến này; nếu chưa đặt biến thì giữ nguyên `js/config.js` trong repo.
 
-Hoặc import repo này trên [vercel.com](https://vercel.com/new) — không cần cấu hình gì thêm (static site, không build step).
+Mỗi lần merge vào `main`, Vercel tự deploy lại.
 
 ## Phase 2 (dự kiến)
 
