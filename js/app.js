@@ -5,6 +5,7 @@
   let TEAMS = [];
   let MEMBERS = [];
   let pins = [];
+  let IDEAS = [];
 
   let user = null;
   let search = '';
@@ -528,6 +529,59 @@
       || (p.author||'').toLowerCase().includes(q);
   }
 
+  /* ---------- ý tưởng & feedback: vote ▲▼ ---------- */
+  const ideaScore = i => (i.upVoters||[]).length - (i.downVoters||[]).length;
+  function renderIdeas(){
+    const listEl = document.getElementById('ideaList');
+    if(!IDEAS.length){
+      listEl.innerHTML = `<p class="idea-empty">Chưa có ý tưởng nào — gửi ý tưởng đầu tiên đi!</p>`;
+      return;
+    }
+    const me = user ? user.display : null;
+    const sorted = [...IDEAS].sort((a,b) => ideaScore(b) - ideaScore(a) || createdMs(a) - createdMs(b));
+    listEl.innerHTML = sorted.map((i, idx) => {
+      const score = ideaScore(i);
+      const top = idx === 0 && score > 0;
+      return `
+        <div class="idea-row ${top?'top':''}">
+          <div class="idea-votes">
+            <button class="vote-btn ${me && i.upVoters.includes(me)?'on-up':''}" data-id="${i.id}" data-dir="up" title="Đáng làm (${i.upVoters.length})">▲</button>
+            <b class="idea-score ${score>0?'pos':score<0?'neg':''}">${score}</b>
+            <button class="vote-btn ${me && i.downVoters.includes(me)?'on-down':''}" data-id="${i.id}" data-dir="down" title="Chưa cần (${i.downVoters.length})">▼</button>
+          </div>
+          <div class="idea-main">
+            ${top?'<span class="idea-top-badge">🏆 nhiều vote nhất</span>':''}
+            <p>${esc(i.content)}</p>
+            <span class="idea-meta">${esc(i.author)} · ${timeAgo(i.createdAt)}</span>
+          </div>
+        </div>`;
+    }).join('');
+    listEl.querySelectorAll('.vote-btn').forEach(btn => btn.addEventListener('click', async () => {
+      if(!user){ toast('Nhập tên ở màn hình chào để vote nhé.'); return; }
+      try{
+        const updated = await Store.voteIdea(btn.dataset.id, user.display, btn.dataset.dir);
+        const i = IDEAS.find(x => x.id === btn.dataset.id);
+        if(i && updated) Object.assign(i, updated);
+        renderIdeas();
+      }catch(e){ fail(e, 'Không vote được, thử lại nhé.'); }
+    }));
+  }
+  async function submitIdea(){
+    const input = document.getElementById('ideaInput');
+    const content = input.value.trim();
+    if(!content){ input.focus(); return; }
+    if(!user){ toast('Nhập tên ở màn hình chào để gửi ý tưởng nhé.'); return; }
+    try{
+      const idea = await Store.addIdea({content, author: user.display});
+      IDEAS.push(idea);
+      input.value = '';
+      renderIdeas();
+      toast('💡 Đã gửi ý tưởng!');
+    }catch(e){ fail(e, 'Không gửi được ý tưởng.'); }
+  }
+  document.getElementById('ideaSend').addEventListener('click', submitIdea);
+  document.getElementById('ideaInput').addEventListener('keydown', e => { if(e.key === 'Enter') submitIdea(); });
+
   function renderHeatmap(){
     const stats = TEAMS.map(t => {
       const counts = {ttkhan:0, tkhan:0, khan:0, bt:0};
@@ -574,6 +628,7 @@
   function render(){
     renderFilterChips();
     renderHeatmap();
+    renderIdeas();
 
     // urgent strip: ghim nổi + quá hạn + hôm nay + deadline trong 3 ngày, bỏ qua filter/search
     const urgentList = pins.filter(isUrgent).sort((a,b) => sortKey(a)-sortKey(b)).slice(0,8);
@@ -604,6 +659,7 @@
     COLLECTIONS = data.collections;
     TEAMS = data.teams;
     MEMBERS = data.members || [];
+    IDEAS = data.ideas || [];
     if(!COLLECTIONS.find(c => c.id === composerColl)){
       composerColl = COLLECTIONS[0] ? COLLECTIONS[0].id : 'viec';
     }
