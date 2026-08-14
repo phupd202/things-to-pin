@@ -37,12 +37,16 @@ create table if not exists public.pins (
   priority text not null default 'bt' check (priority in ('ttkhan','tkhan','khan','bt')),
   collection_id text references public.collections(id) on delete set null,
   starred boolean not null default false,
+  done boolean not null default false,
   created_by text not null,
   created_by_team text,
   updated_by text,
   created_at timestamptz not null default now(),
   updated_at timestamptz
 );
+
+-- Nâng cấp cho database đã tạo từ trước (chạy lại file này là đủ)
+alter table public.pins add column if not exists done boolean not null default false;
 
 create index if not exists pins_deadline_idx on public.pins (deadline);
 create index if not exists pins_collection_idx on public.pins (collection_id);
@@ -86,7 +90,16 @@ drop policy if exists "anon full access members" on public.members;
 create policy "anon full access members" on public.members
   for all using (true) with check (true);
 
--- Bật realtime để mọi người thấy thay đổi ngay
-alter publication supabase_realtime add table public.pins;
-alter publication supabase_realtime add table public.collections;
-alter publication supabase_realtime add table public.teams;
+-- Bật realtime để mọi người thấy thay đổi ngay (bỏ qua nếu đã bật)
+do $$ begin
+  alter publication supabase_realtime add table public.pins;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.collections;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.teams;
+exception when duplicate_object then null; end $$;
+do $$ begin
+  alter publication supabase_realtime add table public.members;
+exception when duplicate_object then null; end $$;

@@ -7,6 +7,10 @@ Bảng ghim chung của phòng — thay cho việc pin nhiều nội dung trên 
 ## Tính năng (Phase 1)
 
 - CRUD Pin: 1 pin = nội dung + link + deadline + thành phần tham gia + độ ưu tiên.
+- Thành phần tham gia gồm cả **tổ** lẫn **người cụ thể** — chọn từ danh sách thành viên đã vào web (bảng `members`).
+- Đánh dấu pin **đã xong** (✓): pin mờ đi, rơi xuống cuối bảng, có bộ lọc “✅ Đã xong” riêng.
+- Bộ lọc **🙋 Của tôi**: pin gán cho mình / tổ mình hoặc do mình tạo.
+- **🔗 Chép link** tới từng pin (`?pin=<id>`) để dán vào chat — mở link là pin bật lên ngay.
 - Collections (nhóm pin): Việc cần chú ý, Tài liệu, Link/Slide... — tự tạo nhóm mới ngay trong composer.
 - Dải **"Cần chú ý ngay"**: ghim nổi (⭐), pin quá hạn, deadline hôm nay và trong 3 ngày tới.
 - Ghim nổi (⭐) đưa pin quan trọng lên đầu bảng.
@@ -26,7 +30,7 @@ Bảng ghim chung của phòng — thay cho việc pin nhiều nội dung trên 
 ### 1. Tạo backend Supabase (miễn phí)
 
 1. Tạo project tại [supabase.com](https://supabase.com/dashboard).
-2. Vào **SQL Editor** → New query → dán toàn bộ nội dung `supabase/schema.sql` → **Run**.
+2. Vào **SQL Editor** → New query → dán toàn bộ nội dung `supabase/schema.sql` → **Run**. (Database tạo từ trước? Chạy lại file này là đủ — script tự thêm cột/bảng mới, không mất dữ liệu.)
 3. Vào **Settings → API**, copy **Project URL** và **anon public key**.
 4. Điền vào `js/config.js`:
 
