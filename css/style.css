@@ -442,6 +442,20 @@ body{
 }
 .puzzle-cell:hover{ background:var(--line); }
 .puzzle-cell.blank{ background:transparent; border-style:dashed; cursor:default; }
+.rps-row{ display:flex; gap:7px; }
+.rps-btn{
+  flex:1; aspect-ratio:1.3; border:1px solid var(--line); border-radius:9px; background:var(--board);
+  font-size:22px; cursor:pointer; transition:transform .12s ease;
+}
+.rps-btn:hover{ background:var(--line); transform:scale(1.06); }
+.mem-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.mem-cell{
+  aspect-ratio:1; border:1px solid var(--line); border-radius:9px; background:var(--board);
+  font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:transform .12s ease;
+}
+.mem-cell:hover{ background:var(--line); }
+.mem-cell.flip{ background:#fff; transform:scale(1.05); }
 
 @media (max-width:900px){
   .wrap{ max-width:760px; }

@@ -68,14 +68,18 @@
   }
   renderReminder();
 
-  /* ---------- Game hôm nay: mỗi ngày một game, cả phòng thấy cùng nhau ---------- */
+  /* ---------- Game hôm nay: xoay vòng 5 game, mỗi ngày một game ---------- */
   const gameBody = document.getElementById('gameBody');
   const GAMES = [
     {id:'guess', label:'🎯 Đoán số', render:renderGuess},
     {id:'simon', label:'🎨 Simon', render:renderSimon},
-    {id:'puzzle', label:'🔢 Xếp số', render:renderPuzzle}
+    {id:'puzzle', label:'🔢 Xếp số', render:renderPuzzle},
+    {id:'rps', label:'✊ Kéo–búa–bao', render:renderRps},
+    {id:'memory', label:'🃏 Lật thẻ', render:renderMemory}
   ];
-  const todayGame = pick(GAMES, 5);
+  // số ngày theo giờ địa phương → mỗi game xuất hiện đúng 1 lần trong chu kỳ 5 ngày
+  const dayIndex = Math.floor((now.getTime() - now.getTimezoneOffset()*60000) / 86400000);
+  const todayGame = GAMES[dayIndex % GAMES.length];
   const tabsEl = document.getElementById('gameTabs');
   tabsEl.innerHTML = `
     <span class="game-of-day">🎮 Game hôm nay</span>
@@ -167,6 +171,84 @@
         msg.innerHTML = `💥 Sai rồi! Bạn nhớ được <b>${seq.length-1}</b> bước (kỷ lục: ${best}). <button class="fun-btn" id="simonStart2">Chơi lại</button>`;
         seq = [];
         document.getElementById('simonStart2').addEventListener('click', () => { seq = []; nextRound(); });
+      }
+    }));
+  }
+
+  /* --- Kéo–búa–bao với máy --- */
+  function renderRps(){
+    const MOVES = [
+      {icon:'✊', name:'Búa'},
+      {icon:'✋', name:'Bao'},
+      {icon:'✌️', name:'Kéo'}
+    ];
+    let win = 0, lose = 0, draw = 0;
+    gameBody.innerHTML = `
+      <p class="fun-game-hint">Chọn kéo, búa hay bao — đấu với máy!</p>
+      <div class="rps-row" id="rpsRow">
+        ${MOVES.map((m,i) => `<button class="rps-btn" data-i="${i}" title="${m.name}">${m.icon}</button>`).join('')}
+      </div>
+      <p class="fun-game-msg" id="rpsMsg"></p>
+      <p class="fun-game-msg" id="rpsScore"></p>
+    `;
+    const msg = document.getElementById('rpsMsg');
+    const score = document.getElementById('rpsScore');
+    document.querySelectorAll('.rps-btn').forEach(btn => btn.addEventListener('click', () => {
+      const me = +btn.dataset.i;
+      const bot = Math.floor(Math.random()*3);
+      // 0 búa thắng 2 kéo; 1 bao thắng 0 búa; 2 kéo thắng 1 bao
+      const r = (bot - me + 3) % 3;
+      let verdict;
+      if(r === 0){ draw++; verdict = '🤝 Hòa!'; }
+      else if(r === 2){ win++; verdict = '🎉 Bạn thắng!'; }
+      else { lose++; verdict = '😅 Máy thắng!'; }
+      msg.textContent = `Bạn ${MOVES[me].icon} vs ${MOVES[bot].icon} máy — ${verdict}`;
+      score.textContent = `Thắng ${win} · Thua ${lose} · Hòa ${draw}`;
+    }));
+  }
+
+  /* --- Lật thẻ tìm cặp (trí nhớ) --- */
+  function renderMemory(){
+    const ICONS = ['📌','🚀','🍀','☕','🎧','⭐'];
+    const cards = [...ICONS, ...ICONS]
+      .map(v => ({v, r: Math.random()}))
+      .sort((a,b) => a.r - b.r)
+      .map(c => c.v);
+    let open = [], matched = new Set(), moves = 0, lock = false;
+    gameBody.innerHTML = `
+      <p class="fun-game-hint">Lật 2 thẻ mỗi lượt, tìm đủ 6 cặp giống nhau.</p>
+      <div class="mem-grid">
+        ${cards.map((c,i) => `<button class="mem-cell" data-i="${i}">❓</button>`).join('')}
+      </div>
+      <p class="fun-game-msg" id="memMsg">Số lượt: 0</p>
+    `;
+    const cells = [...document.querySelectorAll('.mem-cell')];
+    const msg = document.getElementById('memMsg');
+    cells.forEach(cell => cell.addEventListener('click', () => {
+      const i = +cell.dataset.i;
+      if(lock || matched.has(i) || open.includes(i)) return;
+      cell.textContent = cards[i];
+      cell.classList.add('flip');
+      open.push(i);
+      if(open.length === 2){
+        moves++;
+        const [a, b] = open;
+        if(cards[a] === cards[b]){
+          matched.add(a); matched.add(b);
+          open = [];
+          if(matched.size === cards.length){
+            msg.innerHTML = `🎉 Xong trong <b>${moves}</b> lượt! <button class="fun-btn" id="memAgain">Chơi lại</button>`;
+            document.getElementById('memAgain').addEventListener('click', renderMemory);
+            return;
+          }
+        } else {
+          lock = true;
+          setTimeout(() => {
+            [a, b].forEach(j => { cells[j].textContent = '❓'; cells[j].classList.remove('flip'); });
+            open = []; lock = false;
+          }, 750);
+        }
+        msg.textContent = `Số lượt: ${moves}`;
       }
     }));
   }
