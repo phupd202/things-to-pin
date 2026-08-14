@@ -68,18 +68,28 @@
   }
   renderReminder();
 
-  /* ---------- Mini games ---------- */
+  /* ---------- Game hôm nay: mỗi ngày một game, cả phòng thấy cùng nhau ---------- */
   const gameBody = document.getElementById('gameBody');
-  const tabs = document.querySelectorAll('#gameTabs button');
-  let activeGame = null;
-  tabs.forEach(btn => btn.addEventListener('click', () => {
-    activeGame = activeGame === btn.dataset.g ? null : btn.dataset.g;
-    tabs.forEach(b => b.classList.toggle('on', b.dataset.g === activeGame));
-    if(activeGame === 'guess') renderGuess();
-    else if(activeGame === 'simon') renderSimon();
-    else if(activeGame === 'puzzle') renderPuzzle();
+  const GAMES = [
+    {id:'guess', label:'🎯 Đoán số', render:renderGuess},
+    {id:'simon', label:'🎨 Simon', render:renderSimon},
+    {id:'puzzle', label:'🔢 Xếp số', render:renderPuzzle}
+  ];
+  const todayGame = pick(GAMES, 5);
+  const tabsEl = document.getElementById('gameTabs');
+  tabsEl.innerHTML = `
+    <span class="game-of-day">🎮 Game hôm nay</span>
+    <button data-g="${todayGame.id}">${todayGame.label} — Chơi</button>
+  `;
+  const gameBtn = tabsEl.querySelector('button');
+  let gameOpen = false;
+  gameBtn.addEventListener('click', () => {
+    gameOpen = !gameOpen;
+    gameBtn.classList.toggle('on', gameOpen);
+    gameBtn.textContent = gameOpen ? `${todayGame.label} — Đóng` : `${todayGame.label} — Chơi`;
+    if(gameOpen) todayGame.render();
     else gameBody.innerHTML = '';
-  }));
+  });
 
   /* --- Đoán số 1–100 --- */
   function renderGuess(){
