@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Things to Pin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2C8.7 2 6 4.7 6 8c0 4.2 6 12 6 12s6-7.8 6-12c0-3.3-2.7-6-6-6z' fill='%23E4574B'/><circle cx='12' cy='8' r='2.6' fill='white'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <h2>🔥 Tải việc theo tổ</h2>
+      <p class="sub">Số pin đang gán cho từng tổ, theo mức độ ưu tiên. Bấm 1 tổ để lọc bảng ghim.</p>
+      <div id="heatFilterNote"></div>
+      <div class="heat-head">
+        <span></span>
+        <span title="Thượng thượng khẩn">TTK</span>
+        <span title="Thượng khẩn">TK</span>
+        <span title="Khẩn">K</span>
+        <span title="Bình thường">BT</span>
+        <span title="Tổng số">Σ</span>
+      </div>
+      <div id="heatBody"></div>
+    </div>
+
+    <div class="main-col">
+      <div class="topbar">
+        <div class="brand">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.7 2 6 4.7 6 8c0 4.2 6 12 6 12s6-7.8 6-12c0-3.3-2.7-6-6-6z" fill="#E4574B"/><circle cx="12" cy="8" r="2.6" fill="#fff"/></svg>
+          <h1>Things to Pin</h1>
+          <span class="badge-demo" id="modeBadge"></span>
+        </div>
+        <div class="whoami" id="whoami"></div>
+      </div>
+
+      <p class="greeting" id="greetingLine"></p>
+
+      <div class="composer" id="composer">
+        <div class="composer-head" id="composerHead">
+          <span class="plus">+</span>
+          <span>Ghim nhanh một việc, một link, hay một lưu ý...</span>
+        </div>
+        <div class="composer-body" id="composerBody">
+          <textarea id="cContent" placeholder="Nội dung cần lưu ý..."></textarea>
+          <div class="row2">
+            <div>
+              <label class="f-label">Link (nếu có)</label>
+              <input class="f-input" id="cUrl" placeholder="https://...">
+            </div>
+            <div>
+              <label class="f-label">Deadline (nếu có)</label>
+              <input class="f-input" type="date" id="cDeadline">
+            </div>
+          </div>
+          <div class="row2">
+            <div>
+              <label class="f-label">Thành phần tham gia</label>
+              <div class="coll-chips" id="cPeopleChips"></div>
+            </div>
+            <div>
+              <label class="f-label">Độ ưu tiên</label>
+              <div class="seg" id="cPrioritySeg">
+                <button data-v="ttkhan" class="p-ttkhan">Thượng thượng khẩn</button>
+                <button data-v="tkhan" class="p-tkhan">Thượng khẩn</button>
+                <button data-v="khan" class="p-khan">Khẩn</button>
+                <button data-v="bt" class="p-bt on">Bình thường</button>
+              </div>
+            </div>
+          </div>
+          <label class="f-label">Thuộc nhóm</label>
+          <div class="coll-chips" id="cCollChips"></div>
+          <label class="star-toggle"><input type="checkbox" id="cStar"> ⭐ Ghim nổi lên đầu bảng</label>
+          <div class="composer-actions">
+            <button class="btn-ghost" id="cCancel">Huỷ</button>
+            <button class="btn-solid" id="cSave">📌 Ghim lại</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="urgent-section">
+        <p class="urgent-title"><span class="dot"></span>Cần chú ý ngay <span class="urgent-sub">— ghim nổi, quá hạn &amp; deadline trong 3 ngày tới</span></p>
+        <div class="urgent-track" id="urgentTrack"></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9AA1AC" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="searchInput" placeholder="Tìm nội dung, link, người...">
+        </div>
+        <div class="filter-chips" id="filterChips"></div>
+      </div>
+
+      <p class="board-title" id="boardTitle">Bảng ghim</p>
+      <div class="board" id="board"></div>
+
+      <p class="footer-note" id="footerNote"></p>
+    </div>
+  </div>
+</div>
+
+<div class="gate-overlay" id="gate" style="display:none;">
+  <div class="gate-card">
+    <div class="emoji">📌</div>
+    <h2>Chào mừng đến Things to Pin</h2>
+    <p>Nhập tên và tổ chuyên môn để bắt đầu — phòng sẽ biết ai vừa ghim gì.</p>
+    <input class="f-input" id="gName" placeholder="Tên của bạn">
+    <input class="f-input" id="gTeam" placeholder="Tổ chuyên môn (gõ tên mới nếu chưa có)" list="teamList">
+    <datalist id="teamList"></datalist>
+    <button class="btn-solid" id="gEnter">Vào bảng ghim</button>
+  </div>
+</div>
+
+<div class="view-overlay" id="viewOverlay">
+  <div class="view-modal" id="viewModal"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
