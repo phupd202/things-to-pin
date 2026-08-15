@@ -226,13 +226,15 @@ body{
 .board{ display:grid; grid-template-columns:repeat(auto-fill, minmax(232px,1fr)); gap:18px; }
 .card{
   position:relative; border-radius:12px; padding:16px 14px 12px; border:1px solid rgba(0,0,0,.05);
+  border-left:4px solid var(--edge, rgba(0,0,0,.08)); /* màu mép trái = độ ưu tiên (xanh lá khi đã xong) */
   box-shadow:var(--shadow-card); cursor:pointer; transition:box-shadow .18s ease, transform .18s ease;
   transform:rotate(var(--rot, 0deg));
 }
 .card:hover{ box-shadow:0 2px 5px rgba(35,38,43,.09), 0 8px 16px rgba(35,38,43,.09); transform:rotate(var(--rot, 0deg)) translateY(-2px); }
 .card.editing{ cursor:default; grid-column:span 1; }
 .card.starred{ box-shadow:0 0 0 2px var(--star), var(--shadow-card); }
-.card.done{ opacity:.55; }
+.card.hot{ box-shadow:0 0 0 2px rgba(228,87,75,.55), var(--shadow-card); } /* quá hạn / deadline hôm nay */
+.card.done{ opacity:.55; filter:saturate(.55); }
 .card.done p.content{ text-decoration:line-through; text-decoration-thickness:1.5px; }
 .clip{
   position:absolute; top:-10px; left:14px; width:22px; height:22px;
@@ -271,6 +273,7 @@ body{
   border-top:1px dashed rgba(0,0,0,.12); padding-top:8px; margin-top:2px;
 }
 .card .actions{ display:flex; gap:6px; }
+.card .views{ white-space:nowrap; }
 .card .actions button{
   border:none; background:none; cursor:pointer; color:rgba(35,38,43,.45); font-size:12px; padding:1px 3px;
 }

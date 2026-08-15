@@ -80,6 +80,17 @@
       data.pins = data.pins.filter(p => p.id !== id);
       lsSave(data);
     },
+    async markViewed(id, viewer){
+      const data = lsLoad();
+      const p = data.pins.find(x => x.id === id);
+      if(!p) return null;
+      p.viewers = p.viewers || [];
+      if(!p.viewers.includes(viewer)){
+        p.viewers.push(viewer);
+        lsSave(data);
+      }
+      return p;
+    },
     async addCollection(label){
       const data = lsLoad();
       const c = NEW_COLL_PALETTE[data.collections.length % NEW_COLL_PALETTE.length];
@@ -132,6 +143,7 @@
         people: r.people || [],
         priority: r.priority,
         done: !!r.done,
+        viewers: r.viewers || [],
         collection: r.collection_id,
         starred: !!r.starred,
         author: r.created_by,
@@ -161,6 +173,7 @@
       if('collection' in p) row.collection_id = p.collection;
       if('starred' in p) row.starred = !!p.starred;
       if('done' in p) row.done = !!p.done;
+      if('viewers' in p) row.viewers = p.viewers || [];
       if('author' in p) row.created_by = p.author;
       if('authorTeam' in p) row.created_by_team = p.authorTeam || null;
       if('updatedBy' in p) row.updated_by = p.updatedBy;
@@ -205,6 +218,17 @@
       async deletePin(id){
         const {error} = await client.from('pins').delete().eq('id', id);
         if(error) throw error;
+      },
+      async markViewed(id, viewer){
+        const {data: row, error: readErr} = await client.from('pins').select('viewers').eq('id', id).single();
+        if(readErr) throw readErr;
+        const viewers = row.viewers || [];
+        if(viewers.includes(viewer)) return null;
+        const {data, error} = await client.from('pins')
+          .update({viewers: [...viewers, viewer]})
+          .eq('id', id).select().single();
+        if(error) throw error;
+        return pinFromRow(data);
       },
       async addCollection(label, count){
         const c = NEW_COLL_PALETTE[(count||0) % NEW_COLL_PALETTE.length];
