@@ -225,8 +225,9 @@ body{
 .card{
   position:relative; border-radius:12px; padding:16px 14px 12px; border:1px solid rgba(0,0,0,.05);
   box-shadow:var(--shadow-card); cursor:pointer; transition:box-shadow .18s ease, transform .18s ease;
+  transform:rotate(var(--rot, 0deg));
 }
-.card:hover{ box-shadow:0 2px 5px rgba(35,38,43,.09), 0 8px 16px rgba(35,38,43,.09); transform:translateY(-2px); }
+.card:hover{ box-shadow:0 2px 5px rgba(35,38,43,.09), 0 8px 16px rgba(35,38,43,.09); transform:rotate(var(--rot, 0deg)) translateY(-2px); }
 .card.editing{ cursor:default; grid-column:span 1; }
 .card.starred{ box-shadow:0 0 0 2px var(--star), var(--shadow-card); }
 .card.done{ opacity:.55; }

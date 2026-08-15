@@ -342,7 +342,7 @@
       ? `<span class="deadline-badge" style="background:${um.color}">🗓 ${um.label ? um.label+' · ' : ''}${fmtDate(p.deadline)}</span><br>`
       : '';
     return `
-      <div class="card ${p.starred?'starred':''} ${p.done?'done':''}" style="background:${coll.bg}; transform:rotate(${rotate}deg)" data-id="${p.id}">
+      <div class="card ${p.starred?'starred':''} ${p.done?'done':''}" style="background:${coll.bg}; --rot:${rotate}deg" data-id="${p.id}">
         <svg class="clip" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.7 2 6 4.7 6 8c0 4.2 6 12 6 12s6-7.8 6-12c0-3.3-2.7-6-6-6z" fill="${um.color || '#B9B29A'}"/><circle cx="12" cy="8" r="2.6" fill="#fff"/></svg>
         <div class="card-top">
           <span class="coll-tag" style="background:rgba(255,255,255,.55);color:${coll.ink}">${esc(coll.label)}</span>
