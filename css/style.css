@@ -9,6 +9,8 @@
   --brand-dark:#0A548F;
   --brand-soft:#DCEBF7;
 
+  --side-w:236px;         /* bề rộng cột widget trái — chỉnh 1 chỗ này */
+
   --col-viec:#FFDCC0;
   --col-viec-ink:#8A4A18;
   --col-taily:#CFE6FF;
@@ -358,13 +360,15 @@ body{
 }
 
 /* ---------- workload heatmap sidebar ---------- */
-.layout{ display:grid; grid-template-columns:236px 1fr; gap:22px; align-items:start; }
+.layout{ display:grid; grid-template-columns:var(--side-w) 1fr; gap:22px; align-items:start; }
 .layout > *{ min-width:0; } /* không cho nội dung rộng làm bung cột lưới */
 .side-col{
   display:flex; flex-direction:column; gap:16px;
   position:sticky; top:18px; max-height:calc(100vh - 36px); overflow-y:auto;
   scrollbar-width:thin; padding-bottom:2px;
 }
+/* card trong cột trái luôn nằm gọn trong cột, không tràn sang bảng ghim */
+.side-col > *{ width:auto; max-width:100%; min-width:0; }
 .sidebar{
   background:var(--card); border:1px solid var(--line); border-radius:14px;
   box-shadow:var(--shadow-card); padding:16px 14px; flex-shrink:0;
