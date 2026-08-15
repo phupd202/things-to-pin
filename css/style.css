@@ -8,6 +8,7 @@
   --brand:#0E6BB5;        /* xanh MobiFone */
   --brand-dark:#0A548F;
   --brand-soft:#DCEBF7;
+  --brand-red:#E23B33;    /* đỏ MobiFone (dịu) — điểm nhấn duo-tone */
 
   --side-w:236px;         /* bề rộng cột widget trái — chỉnh 1 chỗ này */
 
@@ -46,6 +47,7 @@ body{
   color:var(--ink);
   background:
     radial-gradient(circle at 1px 1px, rgba(14,107,181,.07) 1px, transparent 0) 0 0/20px 20px,
+    radial-gradient(circle at 1px 1px, rgba(226,59,51,.05) 1px, transparent 0) 10px 10px/20px 20px,
     var(--board);
   min-height:100vh;
 }
@@ -55,6 +57,11 @@ body{
 .topbar{
   display:flex; justify-content:space-between; align-items:center; gap:14px;
   flex-wrap:wrap; margin-bottom:16px;
+  position:relative; padding-bottom:11px;
+}
+.topbar::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:3px; border-radius:3px;
+  background:linear-gradient(90deg, var(--brand), var(--brand-red));
 }
 .brand{ display:flex; align-items:center; gap:9px; }
 .brand svg{ transform:rotate(-16deg); }
@@ -62,6 +69,7 @@ body{
   font-family:'Baloo 2', sans-serif; font-weight:700; font-size:26px; margin:0;
   letter-spacing:-.01em; color:var(--brand-dark);
 }
+.brand h1 .accent{ color:var(--brand-red); }
 .brand .badge-demo{
   font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-soft);
   border:1px dashed var(--line); border-radius:20px; padding:2px 8px; margin-left:4px;
