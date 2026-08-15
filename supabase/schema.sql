@@ -38,6 +38,7 @@ create table if not exists public.pins (
   collection_id text references public.collections(id) on delete set null,
   starred boolean not null default false,
   done boolean not null default false,
+  viewers text[] not null default '{}',
   created_by text not null,
   created_by_team text,
   updated_by text,
@@ -57,6 +58,7 @@ create table if not exists public.ideas (
 
 -- Nâng cấp cho database đã tạo từ trước (chạy lại file này là đủ)
 alter table public.pins add column if not exists done boolean not null default false;
+alter table public.pins add column if not exists viewers text[] not null default '{}';
 
 create index if not exists pins_deadline_idx on public.pins (deadline);
 create index if not exists pins_collection_idx on public.pins (collection_id);

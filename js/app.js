@@ -334,6 +334,12 @@
     const rotate = (h - 2) * 0.7;
     const pm = PRIORITY_META[p.priority] || PRIORITY_META.bt;
     const star = `<span class="star-ico ${p.starred?'':'off'}" data-act="star" data-id="${p.id}" title="${p.starred?'Bỏ ghim nổi':'Ghim nổi lên đầu'}">⭐</span>`;
+    const edgeColor = p.done ? 'var(--urg-sage)' : pm.color;
+    const hot = !p.done && (u === 'overdue' || u === 'today');
+    const viewers = p.viewers || [];
+    const viewsHTML = viewers.length
+      ? ` · <span class="views" title="Đã xem: ${esc(viewers.join(', '))}">👁 ${viewers.length}</span>`
+      : '';
     const prioDot = `<span class="prio-dot" style="background:${pm.color}" title="${esc(pm.label)}"></span>`;
     const peopleHTML = p.people && p.people.length
       ? `<div class="people">${p.people.slice(0,4).map(n => `<span class="av" style="background:${avatarColor(n)}" title="${esc(personTitle(n))}">${initials(n)}</span>`).join('')}${p.people.length>4?`<span class="av" style="background:#9AA1AC">+${p.people.length-4}</span>`:''}</div>`
@@ -342,7 +348,7 @@
       ? `<span class="deadline-badge" style="background:${um.color}">🗓 ${um.label ? um.label+' · ' : ''}${fmtDate(p.deadline)}</span><br>`
       : '';
     return `
-      <div class="card ${p.starred?'starred':''} ${p.done?'done':''}" style="background:${coll.bg}; --rot:${rotate}deg" data-id="${p.id}">
+      <div class="card ${p.starred?'starred':''} ${p.done?'done':''} ${hot?'hot':''}" style="background:${coll.bg}; --rot:${rotate}deg; --edge:${edgeColor}" data-id="${p.id}">
         <svg class="clip" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.7 2 6 4.7 6 8c0 4.2 6 12 6 12s6-7.8 6-12c0-3.3-2.7-6-6-6z" fill="${um.color || '#B9B29A'}"/><circle cx="12" cy="8" r="2.6" fill="#fff"/></svg>
         <div class="card-top">
           <span class="coll-tag" style="background:rgba(255,255,255,.55);color:${coll.ink}">${esc(coll.label)}</span>
@@ -353,7 +359,7 @@
         ${deadlineHTML}
         ${peopleHTML}
         <div class="meta">
-          <span>${auditLine(p)}</span>
+          <span>${auditLine(p)}${viewsHTML}</span>
           <div class="actions">
             <button data-act="done" data-id="${p.id}" title="${p.done?'Mở lại':'Đánh dấu đã xong'}">${p.done?'↩':'✓'}</button>
             <button data-act="edit" data-id="${p.id}" title="Sửa">✎</button>
@@ -472,6 +478,12 @@
     const peopleHTML = p.people && p.people.length
       ? p.people.map(n => `<span title="${esc(personTitle(n))}"><span class="av" style="background:${avatarColor(n)}">${initials(n)}</span>${esc(n)}</span>`).join('')
       : '<span style="opacity:.55">Chưa gán ai</span>';
+    // ghi nhận người xem (mỗi người tính 1 lần)
+    if(user && !(p.viewers||[]).includes(user.display)){
+      p.viewers = [...(p.viewers||[]), user.display];
+      Store.markViewed(id, user.display).catch(console.error);
+    }
+    const viewers = p.viewers || [];
     const editedLine = p.updatedAt ? ` · sửa lần cuối bởi ${esc(p.updatedBy || p.author)}, ${timeAgo(p.updatedAt)}` : '';
     const modal = document.getElementById('viewModal');
     modal.style.background = coll.bg;
@@ -489,6 +501,7 @@
       <div class="vm-row"><span class="vm-label">Ưu tiên</span><span>${esc(pm.label)}</span></div>
       ${p.deadline ? `<div class="vm-row"><span class="vm-label">Deadline</span><span class="deadline-badge" style="background:${um.color}">🗓 ${um.label?um.label+' · ':''}${fmtDate(p.deadline)}</span></div>` : ''}
       <div class="vm-row"><span class="vm-label">Tham gia</span><div class="vm-people">${peopleHTML}</div></div>
+      <div class="vm-row"><span class="vm-label">Đã xem</span><span class="vm-viewers">👁 ${viewers.length} lượt${viewers.length ? ' · ' + viewers.map(esc).join(', ') : ''}</span></div>
       <div class="vm-meta">Tạo bởi ${esc(p.author)}${p.authorTeam ? ' ('+esc(p.authorTeam)+')' : ''} · ${timeAgo(p.createdAt)}${editedLine}</div>
       <div class="vm-actions">
         <button class="btn-ghost" id="vmDelete">Bỏ ghim</button>
