@@ -49,7 +49,7 @@ body{
     var(--board);
   min-height:100vh;
 }
-.wrap{max-width:1280px; margin:0 auto; padding:22px 20px 70px;}
+.wrap{max-width:1280px; margin:0 auto; padding:22px 32px 70px;}
 
 /* ---------- topbar ---------- */
 .topbar{
