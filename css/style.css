@@ -56,28 +56,24 @@ body{
 /* ---------- topbar ---------- */
 .topbar{
   display:flex; justify-content:space-between; align-items:center; gap:14px;
-  flex-wrap:wrap; margin-bottom:16px;
-  position:relative; padding-bottom:11px;
+  flex-wrap:wrap; margin-bottom:10px;
 }
-.topbar::after{
-  content:''; position:absolute; left:0; right:0; bottom:0; height:6px; border-radius:6px;
+/* dải màu topbar kiêm thanh tiến độ ngày làm việc (8h–17h):
+   buổi sáng chạy phần xanh, buổi chiều chạy dần sang phần đỏ */
+.day-progress{
+  position:relative; height:6px; border-radius:6px; margin:0 0 16px;
   background:linear-gradient(90deg, var(--brand) 0%, var(--brand) 45%, var(--brand-red) 100%);
 }
-/* "đầu ghim" đỏ kết thúc dải màu — điểm nhấn duo-tone */
-.topbar::before{
-  content:''; position:absolute; right:-3px; bottom:-3px; width:12px; height:12px;
-  border-radius:50%; background:var(--brand-red); border:2.5px solid #fff;
-  box-shadow:0 1px 4px rgba(226,59,51,.4);
-}
-/* thanh tiến độ ngày làm việc (8h–17h), nằm ngay dưới dải màu topbar */
-.day-progress{
-  height:4px; border-radius:4px; background:var(--brand-soft);
-  margin:-8px 0 16px; overflow:hidden;
-}
-.day-progress .dp-fill{
-  height:100%; border-radius:4px; width:0;
-  background:linear-gradient(90deg, var(--brand), var(--brand-red));
+.day-progress .dp-cover{
+  position:absolute; top:0; right:0; bottom:0; width:0;
+  border-radius:0 6px 6px 0; background:var(--brand-soft);
   transition:width .6s ease;
+}
+/* "đầu ghim" đỏ kết thúc dải màu — điểm nhấn duo-tone */
+.day-progress::after{
+  content:''; position:absolute; right:-3px; top:50%; transform:translateY(-50%);
+  width:12px; height:12px; border-radius:50%; background:var(--brand-red);
+  border:2.5px solid #fff; box-shadow:0 1px 4px rgba(226,59,51,.4);
 }
 .brand{ display:flex; align-items:center; gap:9px; }
 .brand svg{ transform:rotate(-16deg); }
@@ -97,6 +93,13 @@ body{
   border:1px dashed var(--line); border-radius:20px; padding:2px 8px; margin-left:4px;
 }
 .brand .badge-demo:empty{ display:none; }
+/* chip thời tiết cạnh tiêu đề */
+.weather-chip{
+  display:inline-flex; align-items:center; gap:4px;
+  font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--brand-dark);
+  background:var(--brand-soft); border-radius:20px; padding:3px 10px; margin-left:4px;
+}
+.weather-chip:empty{ display:none; }
 .whoami{ display:flex; align-items:center; gap:10px; font-size:13.5px; }
 .whoami .avatar{
   width:30px; height:30px; border-radius:50%; background:var(--primary,#243B55);
