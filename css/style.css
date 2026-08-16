@@ -406,7 +406,7 @@ body{
 .side-col{
   display:flex; flex-direction:column; gap:16px;
   position:sticky; top:18px; max-height:calc(100vh - 36px); overflow-y:auto;
-  scrollbar-width:thin; padding-bottom:2px;
+  scrollbar-width:thin; padding:0 10px 2px 0; /* chừa khoảng cách với thanh scroll */
 }
 /* card trong cột trái luôn nằm gọn trong cột, không tràn sang bảng ghim */
 .side-col > *{ width:auto; max-width:100%; min-width:0; }
