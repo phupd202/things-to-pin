@@ -51,7 +51,7 @@ body{
     var(--board);
   min-height:100vh;
 }
-.wrap{max-width:1280px; margin:0 auto; padding:22px 24px 70px;}
+.wrap{max-width:1500px; margin:0 auto; padding:22px 24px 70px;}
 
 /* ---------- topbar ---------- */
 .topbar{
@@ -410,8 +410,6 @@ body{
 }
 /* card trong cột trái luôn nằm gọn trong cột, không tràn sang bảng ghim */
 .side-col > *{ width:auto; max-width:100%; min-width:0; }
-/* màn rộng hơn 1280px: dịch cột widget ra chính giữa khoảng trống bên trái trang */
-.side-col{ margin-left:clamp(-110px, calc((1280px - 100vw)/4), 0px); }
 .sidebar{
   background:var(--card); border:1px solid var(--line); border-radius:10px;
   box-shadow:var(--shadow-card); padding:18px 16px; flex-shrink:0;
