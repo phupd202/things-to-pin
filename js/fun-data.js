@@ -67,6 +67,29 @@ window.FUN_DATA = {
     'Chớp mắt chậm 10 lần khi mắt khô vì nhìn màn hình lâu.',
     'Đừng ăn trưa quá no nếu chiều có cuộc họp quan trọng.'
   ],
+  // "Món quà" mỗi ngày: xen kẽ kiến thức hay / bài nhạc / món ăn nhẹ cho bữa trưa
+  extras: [
+    {tag:'🎵 Nhạc hay', text:'“Ngày chưa giông bão” — Bùi Lan Hương. Nhẹ nhàng cho một buổi làm việc tập trung.'},
+    {tag:'📚 Bạn có biết', text:'Cáp quang biển truyền ~99% lưu lượng internet quốc tế — sóng vệ tinh chỉ là phần rất nhỏ.'},
+    {tag:'🍜 Bữa trưa nhẹ', text:'Bún chả + chút rau sống — đủ năng lượng mà chiều không buồn ngủ.'},
+    {tag:'🎵 Nhạc hay', text:'“Clair de Lune” — Debussy. Nhạc không lời, hợp lúc cần nghĩ sâu.'},
+    {tag:'📚 Bạn có biết', text:'Chuẩn giờ của mạng viễn thông đồng bộ tới phần triệu giây — lệch nhỏ là rớt cuộc gọi.'},
+    {tag:'🍜 Bữa trưa nhẹ', text:'Cơm gà xé + canh rau — nhanh gọn, đạm đủ cho buổi chiều họp hành.'},
+    {tag:'🎵 Nhạc hay', text:'“Fly Me to the Moon” — Frank Sinatra. Jazz nhẹ cho giờ nghỉ trưa.'},
+    {tag:'📚 Bạn có biết', text:'Mật khẩu 12 ký tự ngẫu nhiên mất hàng trăm năm để dò — 8 ký tự chỉ vài giờ.'},
+    {tag:'🍜 Bữa trưa nhẹ', text:'Phở gà + trà đá — combo kinh điển không bao giờ sai.'},
+    {tag:'🎵 Nhạc hay', text:'“Mưa rơi lặng thầm” — Trung Quân. Hợp những chiều mưa nhìn ra cửa sổ.'},
+    {tag:'📚 Bạn có biết', text:'Não người xử lý hình ảnh nhanh gấp ~60.000 lần chữ viết — vì thế dashboard trực quan luôn thắng báo cáo dài.'},
+    {tag:'🍜 Bữa trưa nhẹ', text:'Bánh mì trứng + sữa chua hoa quả — gọn nhẹ cho ngày bận.'},
+    {tag:'🎵 Nhạc hay', text:'“River Flows in You” — Yiruma. Piano dịu cho lúc cần bình tĩnh xử lý sự cố.'},
+    {tag:'📚 Bạn có biết', text:'Quy tắc 1-10-100: lỗi phát hiện lúc thiết kế tốn 1 đồng, lúc triển khai 10 đồng, khi vận hành 100 đồng.'},
+    {tag:'🍜 Bữa trưa nhẹ', text:'Bún riêu + rau muống chẻ — chua nhẹ, chống ngán giữa tuần.'},
+    {tag:'🎵 Nhạc hay', text:'“Có chàng trai viết lên cây” — Phan Mạnh Quỳnh. Nghe lúc nghỉ trưa cho thư thả.'},
+    {tag:'📚 Bạn có biết', text:'80% sự cố mạng nghiêm trọng bắt nguồn từ thay đổi cấu hình — vì thế mới cần quy trình change management.'},
+    {tag:'🍜 Bữa trưa nhẹ', text:'Cháo sườn + quẩy — ấm bụng cho những hôm trở trời.'},
+    {tag:'🎵 Nhạc hay', text:'“Lofi chill Việt” — playlist không lời, bật nhỏ làm nền cả buổi chiều.'},
+    {tag:'📚 Bạn có biết', text:'Tháp truyền hình cao nhất Việt Nam ở Hà Nội cao 250m — nhưng trạm BTS chỉ cần 30–70m là phủ tốt một khu dân cư.'}
+  ],
   quiz: [
     {q:'Cái gì càng lấy đi càng to ra?', a:'Cái hố'},
     {q:'Con gì đầu dê mình ốc?', a:'Con dốc'},

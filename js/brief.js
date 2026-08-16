@@ -26,6 +26,14 @@
     return [];
   }
 
+  // Chip thời tiết cạnh tiêu đề: icon theo nhóm thời tiết + nhiệt độ
+  const WEATHER_ICONS = {clear:'☀️', cloudy:'⛅', fog:'🌫️', rain:'🌧️', storm:'⛈️', snow:'❄️'};
+  function renderWeatherChip(){
+    const el = document.getElementById('weatherChip');
+    if(!el) return;
+    el.textContent = weather ? `${WEATHER_ICONS[weather.kind] || '⛅'} ${weather.temp}°C` : '';
+  }
+
   function esc(s){
     return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
@@ -52,7 +60,7 @@
     if(!weatherLoaded && window.WeatherHelper){
       weatherLoaded = true;
       window.WeatherHelper.getWeather().then(w => {
-        if(w){ weather = w; render(); }
+        if(w){ weather = w; render(); renderWeatherChip(); }
       });
     }
   }

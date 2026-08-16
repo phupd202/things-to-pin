@@ -17,6 +17,7 @@
     <div class="daily-item"><span class="daily-tag" style="background:var(--col-link);color:var(--col-link-ink)">Châm ngôn</span><p>“${esc(pick(D.quotes, 1))}”</p></div>
     <div class="daily-item"><span class="daily-tag" style="background:var(--col-taily);color:var(--col-taily-ink)">Tip nghiệp vụ</span><p>${esc(pick(D.tips, 2))}</p></div>
     <div class="daily-item"><span class="daily-tag" style="background:var(--col-viec);color:var(--col-viec-ink)">Mẹo nhỏ</span><p>${esc(pick(D.hacks, 3))}</p></div>
+    ${(() => { const x = pick(D.extras, 7); return `<div class="daily-item"><span class="daily-tag" style="background:var(--col-neutral);color:var(--col-neutral-ink)">${esc(x.tag)}</span><p>${esc(x.text)}</p></div>`; })()}
   `;
 
   /* ---------- Câu đố hôm nay ---------- */
