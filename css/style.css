@@ -410,10 +410,8 @@ body{
 }
 /* card trong cột trái luôn nằm gọn trong cột, không tràn sang bảng ghim */
 .side-col > *{ width:auto; max-width:100%; min-width:0; }
-/* màn rộng: dịch cột widget ra chính giữa khoảng trống bên trái trang */
-@media (min-width:1380px){
-  .side-col{ margin-left:max(-110px, calc((1280px - 100vw)/4)); }
-}
+/* màn rộng hơn 1280px: dịch cột widget ra chính giữa khoảng trống bên trái trang */
+.side-col{ margin-left:clamp(-110px, calc((1280px - 100vw)/4), 0px); }
 .sidebar{
   background:var(--card); border:1px solid var(--line); border-radius:10px;
   box-shadow:var(--shadow-card); padding:18px 16px; flex-shrink:0;
