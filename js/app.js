@@ -688,11 +688,18 @@
     const el = document.getElementById('dayProgress');
     if(!el) return;
     const now = new Date();
+    const cover = el.querySelector('.dp-cover');
+    const day = now.getDay();
+    if(day === 0 || day === 6){
+      cover.style.width = '100%';
+      el.dataset.tip = 'Cuối tuần — nghỉ ngơi nhé 🎉';
+      return;
+    }
     const h = now.getHours() + now.getMinutes()/60;
     const pct = Math.max(0, Math.min(1, (h - WORK_START)/(WORK_END - WORK_START)));
-    el.querySelector('.dp-cover').style.width = ((1 - pct)*100).toFixed(1) + '%';
-    el.title = pct <= 0 ? 'Chưa tới giờ làm việc (8h00–17h00)'
-      : pct >= 1 ? 'Đã hết giờ làm việc (8h00–17h00)'
+    cover.style.width = ((1 - pct)*100).toFixed(1) + '%';
+    el.dataset.tip = pct <= 0 ? 'Chưa tới giờ làm việc (8h00–17h00)'
+      : pct >= 1 ? 'Đã hết giờ làm việc (8h00–17h00) — về thôi!'
       : `Đã qua ${Math.round(pct*100)}% ngày làm việc (8h00–17h00)`;
   }
 
