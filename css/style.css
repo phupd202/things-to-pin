@@ -51,7 +51,7 @@ body{
     var(--board);
   min-height:100vh;
 }
-.wrap{max-width:1280px; margin:0 auto; padding:22px 32px 70px;}
+.wrap{max-width:1500px; margin:0 auto; padding:22px 24px 70px;}
 
 /* ---------- topbar ---------- */
 .topbar{
@@ -72,7 +72,7 @@ body{
 .brand{ display:flex; align-items:center; gap:9px; }
 .brand svg{ transform:rotate(-16deg); }
 .brand h1{
-  font-family:'Baloo 2', sans-serif; font-weight:700; font-size:26px; margin:0;
+  font-family:'Baloo 2', sans-serif; font-weight:700; font-size:31px; margin:0;
   letter-spacing:-.01em; color:var(--brand-dark);
 }
 .brand h1 .accent{ color:var(--brand-red); }
