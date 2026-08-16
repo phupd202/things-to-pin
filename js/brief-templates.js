@@ -1,7 +1,7 @@
 // Template Daily Brief. Muốn thêm biến thể: thêm 1 object vào mảng BRIEF_TEMPLATES.
 // Mỗi template: {id, priority, match(ctx), text(ctx)}
 //  - priority: 3 = lễ/sự kiện, 2 = thời tiết / tình huống đặc thù, 1 = chung.
-//  - Engine chọn nhóm priority cao nhất trong các template match, rồi chọn 1 theo seed ngày (không random hoàn toàn).
+//  - Engine chọn nhóm priority cao nhất trong các template match, rồi random nhẹ 1 câu trong nhóm (không random hoàn toàn).
 // Các trường của ctx: xem js/brief-context.js (name, dayPart, weather, event, attention, highPrio, overdue, dueToday, dueSoon, unseen, crossTeam, load).
 (function(){
   // ---- các cụm câu dùng chung ----

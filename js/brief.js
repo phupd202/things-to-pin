@@ -7,16 +7,15 @@
   let lastData = null;
 
   // Chọn template: lấy nhóm priority cao nhất trong các template match,
-  // rồi chọn 1 theo seed (ngày + tên) — cùng ngày cùng người luôn thấy cùng câu.
+  // rồi random nhẹ 1 câu trong nhóm đó — random có điều kiện, không random hoàn toàn.
+  // Giữ nguyên câu trong suốt phiên xem (chỉ đổi khi mở/refresh trang).
+  let sessionRoll = Math.random();
   function pickTemplate(ctx){
     const matched = (window.BRIEF_TEMPLATES || []).filter(t => t.match(ctx));
     if(!matched.length) return null;
     const top = Math.max(...matched.map(t => t.priority));
     const pool = matched.filter(t => t.priority === top);
-    const seedStr = new Date().toDateString() + '|' + ctx.name;
-    let h = 0;
-    for(let i = 0; i < seedStr.length; i++) h = (h * 31 + seedStr.charCodeAt(i)) >>> 0;
-    return pool[h % pool.length];
+    return pool[Math.floor(sessionRoll * pool.length)];
   }
 
   // Decoration chỉ trong header: sự kiện > thời tiết mưa/bão > không có
