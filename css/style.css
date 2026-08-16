@@ -10,7 +10,7 @@
   --brand-soft:#DCEBF7;
   --brand-red:#E23B33;    /* đỏ MobiFone (dịu) — điểm nhấn duo-tone */
 
-  --side-w:288px;         /* bề rộng cột widget trái — chỉnh 1 chỗ này */
+  --side-w:320px;         /* bề rộng cột widget trái — chỉnh 1 chỗ này */
 
   --col-viec:#FFDCC0;
   --col-viec-ink:#8A4A18;
@@ -51,7 +51,7 @@ body{
     var(--board);
   min-height:100vh;
 }
-.wrap{max-width:1500px; margin:0 auto; padding:22px 24px 70px;}
+.wrap{max-width:1280px; margin:0 auto; padding:22px 24px 70px;}
 
 /* ---------- topbar ---------- */
 .topbar{
@@ -410,6 +410,10 @@ body{
 }
 /* card trong cột trái luôn nằm gọn trong cột, không tràn sang bảng ghim */
 .side-col > *{ width:auto; max-width:100%; min-width:0; }
+/* màn rộng: dịch cột widget ra chính giữa khoảng trống bên trái trang */
+@media (min-width:1380px){
+  .side-col{ margin-left:max(-110px, calc((1280px - 100vw)/4)); }
+}
 .sidebar{
   background:var(--card); border:1px solid var(--line); border-radius:10px;
   box-shadow:var(--shadow-card); padding:18px 16px; flex-shrink:0;
