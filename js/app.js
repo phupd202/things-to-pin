@@ -682,9 +682,25 @@
     render();
   }
 
+  /* ---------- thanh tiến độ ngày làm việc (8h → 17h) ---------- */
+  const WORK_START = 8, WORK_END = 17;
+  function renderDayProgress(){
+    const el = document.getElementById('dayProgress');
+    if(!el) return;
+    const now = new Date();
+    const h = now.getHours() + now.getMinutes()/60;
+    const pct = Math.max(0, Math.min(1, (h - WORK_START)/(WORK_END - WORK_START)));
+    el.querySelector('.dp-fill').style.width = (pct*100).toFixed(1) + '%';
+    el.title = pct <= 0 ? 'Chưa tới giờ làm việc (8h00–17h00)'
+      : pct >= 1 ? 'Đã hết giờ làm việc (8h00–17h00)'
+      : `Đã qua ${Math.round(pct*100)}% ngày làm việc (8h00–17h00)`;
+  }
+
   /* ---------- init ---------- */
   (async function init(){
     document.getElementById('modeBadge').textContent = Store.mode === 'local' ? 'chế độ cục bộ' : '';
+    renderDayProgress();
+    setInterval(renderDayProgress, 60 * 1000);
 
     try{
       await reload();

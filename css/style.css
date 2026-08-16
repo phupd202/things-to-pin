@@ -69,6 +69,16 @@ body{
   border-radius:50%; background:var(--brand-red); border:2.5px solid #fff;
   box-shadow:0 1px 4px rgba(226,59,51,.4);
 }
+/* thanh tiến độ ngày làm việc (8h–17h), nằm ngay dưới dải màu topbar */
+.day-progress{
+  height:4px; border-radius:4px; background:var(--brand-soft);
+  margin:-8px 0 16px; overflow:hidden;
+}
+.day-progress .dp-fill{
+  height:100%; border-radius:4px; width:0;
+  background:linear-gradient(90deg, var(--brand), var(--brand-red));
+  transition:width .6s ease;
+}
 .brand{ display:flex; align-items:center; gap:9px; }
 .brand svg{ transform:rotate(-16deg); }
 .brand h1{
