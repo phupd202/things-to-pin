@@ -161,7 +161,6 @@
       document.getElementById('gName').dispatchEvent(new Event('input'));
       gate.style.display = 'flex';
     });
-    document.getElementById('greetingLine').innerHTML = `Chào <b>${esc(user.display)}</b> 👋 — đây là mọi thứ phòng đang cần đọc, cần làm hôm nay.`;
   }
 
   /* ---------- composer ---------- */
@@ -639,6 +638,7 @@
   }
 
   function render(){
+    if(window.Brief) Brief.update({user, pins, teams: TEAMS, members: MEMBERS});
     renderFilterChips();
     renderHeatmap();
     renderIdeas();
