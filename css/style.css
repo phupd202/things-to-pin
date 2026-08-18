@@ -12,13 +12,13 @@
 
   --side-w:320px;         /* bề rộng cột widget trái — chỉnh 1 chỗ này */
 
-  --col-viec:#FFDCC0;
-  --col-viec-ink:#8A4A18;
-  --col-taily:#CFE6FF;
+  --col-viec:#EDD5BE;
+  --col-viec-ink:#7A431A;
+  --col-taily:#C9DCEC;
   --col-taily-ink:#1B4E82;
-  --col-link:#E5DEFF;
+  --col-link:#DBD5EA;
   --col-link-ink:#4A3A8A;
-  --col-neutral:#E1EAF2;
+  --col-neutral:#DCE4EB;
   --col-neutral-ink:#4F6478;
 
   --urg-red:#E4574B;
@@ -289,6 +289,8 @@ body{
   border-left:4px solid var(--edge, rgba(0,0,0,.08)); /* màu mép trái = độ ưu tiên (xanh lá khi đã xong) */
   box-shadow:var(--shadow-card); cursor:pointer; transition:box-shadow .18s ease, transform .18s ease;
   transform:rotate(var(--rot, 0deg));
+  /* lớp phủ xám nhẹ làm trầm màu nền card, kể cả màu collection cũ lưu trong DB */
+  background-image:linear-gradient(rgba(92,107,122,.07), rgba(92,107,122,.07));
 }
 .card:hover{ box-shadow:0 2px 5px rgba(35,38,43,.09), 0 8px 16px rgba(35,38,43,.09); transform:rotate(var(--rot, 0deg)) translateY(-2px); }
 .card.editing{ cursor:default; grid-column:span 1; }

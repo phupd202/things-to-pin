@@ -5,9 +5,9 @@
   const LS_KEY = 'ttp_data_v1';
 
   const DEFAULT_COLLECTIONS = [
-    {id:'viec', label:'Việc cần chú ý', bg:'#FFDCC0', ink:'#8A4A18'},
-    {id:'taily', label:'Tài liệu', bg:'#CFE6FF', ink:'#1B4E82'},
-    {id:'link', label:'Link / Slide', bg:'#E5DEFF', ink:'#4A3A8A'}
+    {id:'viec', label:'Việc cần chú ý', bg:'#EDD5BE', ink:'#7A431A'},
+    {id:'taily', label:'Tài liệu', bg:'#C9DCEC', ink:'#1B4E82'},
+    {id:'link', label:'Link / Slide', bg:'#DBD5EA', ink:'#4A3A8A'}
   ];
   const DEFAULT_TEAMS = [
     'Nhóm Điều hành và Quản lý vận hành',
@@ -18,8 +18,8 @@
     'Nhóm Điều hành dịch vụ'
   ];
   const NEW_COLL_PALETTE = [
-    {bg:'#D9F0DC', ink:'#2C6B3F'}, {bg:'#FFE1EC', ink:'#8A3357'}, {bg:'#E4F0FF', ink:'#2A5D8A'},
-    {bg:'#FFF0C7', ink:'#8A6A17'}, {bg:'#E8E3FF', ink:'#4E3F91'}
+    {bg:'#CFE0D2', ink:'#2C6B3F'}, {bg:'#E8D2DB', ink:'#8A3357'}, {bg:'#D5E1ED', ink:'#2A5D8A'},
+    {bg:'#EAE0C5', ink:'#7A5E1A'}, {bg:'#DCD7EA', ink:'#4E3F91'}
   ];
 
   function uid(){ return 'p_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }

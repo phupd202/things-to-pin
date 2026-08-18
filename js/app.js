@@ -1,5 +1,7 @@
 (function(){
   const USER_KEY = 'ttp_user_v1';
+  const LEADER_ROLE = 'Lãnh đạo phòng'; // trưởng/phó phòng — không thuộc tổ chuyên môn nào
+  const validTeam = t => TEAMS.includes(t) || t === LEADER_ROLE;
 
   let COLLECTIONS = [];
   let TEAMS = [];
@@ -101,8 +103,9 @@
       + MEMBERS.map(m => `<option value="${esc(m.displayName)}">`).join('');
     const sel = document.getElementById('gTeam');
     const current = sel.value;
-    sel.innerHTML = `<option value="" disabled ${current?'':'selected'}>— Chọn tổ chuyên môn —</option>`
-      + TEAMS.map(t => `<option value="${esc(t)}" ${t===current?'selected':''}>${esc(t)}</option>`).join('');
+    sel.innerHTML = `<option value="" disabled ${current?'':'selected'}>— Chọn tổ chuyên môn / vai trò —</option>`
+      + TEAMS.map(t => `<option value="${esc(t)}" ${t===current?'selected':''}>${esc(t)}</option>`).join('')
+      + `<option value="${esc(LEADER_ROLE)}" ${LEADER_ROLE===current?'selected':''}>${esc(LEADER_ROLE)} (Trưởng/Phó phòng)</option>`;
   }
 
   // "Nguyễn Văn An" → "AnNV": tên + chữ cái đầu của họ và tên đệm
@@ -131,7 +134,7 @@
       return;
     }
     if(!team){
-      errEl.textContent = 'Chọn tổ chuyên môn của bạn.';
+      errEl.textContent = 'Chọn tổ chuyên môn (hoặc Lãnh đạo phòng) của bạn.';
       document.getElementById('gTeam').focus();
       return;
     }
@@ -156,7 +159,7 @@
     `;
     document.getElementById('editWho').addEventListener('click', () => {
       document.getElementById('gName').value = user.name;
-      document.getElementById('gTeam').value = TEAMS.includes(user.team) ? user.team : '';
+      document.getElementById('gTeam').value = validTeam(user.team) ? user.team : '';
       renderTeamList();
       document.getElementById('gName').dispatchEvent(new Event('input'));
       gate.style.display = 'flex';
@@ -347,7 +350,7 @@
       ? `<span class="deadline-badge" style="background:${um.color}">🗓 ${um.label ? um.label+' · ' : ''}${fmtDate(p.deadline)}</span><br>`
       : '';
     return `
-      <div class="card ${p.starred?'starred':''} ${p.done?'done':''} ${hot?'hot':''}" style="background:${coll.bg}; --rot:${rotate}deg; --edge:${edgeColor}" data-id="${p.id}">
+      <div class="card ${p.starred?'starred':''} ${p.done?'done':''} ${hot?'hot':''}" style="background-color:${coll.bg}; --rot:${rotate}deg; --edge:${edgeColor}" data-id="${p.id}">
         <svg class="clip" viewBox="0 0 24 24" fill="none"><path d="M12 2C8.7 2 6 4.7 6 8c0 4.2 6 12 6 12s6-7.8 6-12c0-3.3-2.7-6-6-6z" fill="${um.color || '#B9B29A'}"/><circle cx="12" cy="8" r="2.6" fill="#fff"/></svg>
         <div class="card-top">
           <span class="coll-tag" style="background:rgba(255,255,255,.55);color:${coll.ink}">${esc(coll.label)}</span>
@@ -370,7 +373,7 @@
 
   function editHTML(p){
     return `
-      <div class="card editing" style="background:${collOf(p.collection).bg}" data-id="${p.id}">
+      <div class="card editing" style="background-color:${collOf(p.collection).bg}" data-id="${p.id}">
         <div class="edit-body">
           <textarea id="eContent">${esc(p.content)}</textarea>
           <label class="f-label">Link</label>
@@ -598,7 +601,7 @@
     const stats = TEAMS.map(t => {
       const counts = {ttkhan:0, tkhan:0, khan:0, bt:0};
       let total = 0;
-      pins.forEach(p => { if(p.people && p.people.includes(t)){ counts[p.priority] = (counts[p.priority]||0)+1; total++; } });
+      pins.forEach(p => { if(!p.done && p.people && p.people.includes(t)){ counts[p.priority] = (counts[p.priority]||0)+1; total++; } });
       return {team:t, counts, total};
     }).sort((a,b) => b.total - a.total);
 
@@ -716,7 +719,7 @@
     }
 
     user = loadUser();
-    if(user && user.display && TEAMS.includes(user.team)){
+    if(user && user.display && validTeam(user.team)){
       renderWhoami();
       // đối chiếu: đảm bảo thành viên có trong database
       Store.saveMember({fullName: user.name, displayName: user.display, team: user.team}).catch(console.error);
