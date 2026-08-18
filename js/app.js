@@ -601,7 +601,7 @@
     const stats = TEAMS.map(t => {
       const counts = {ttkhan:0, tkhan:0, khan:0, bt:0};
       let total = 0;
-      pins.forEach(p => { if(p.people && p.people.includes(t)){ counts[p.priority] = (counts[p.priority]||0)+1; total++; } });
+      pins.forEach(p => { if(!p.done && p.people && p.people.includes(t)){ counts[p.priority] = (counts[p.priority]||0)+1; total++; } });
       return {team:t, counts, total};
     }).sort((a,b) => b.total - a.total);
 

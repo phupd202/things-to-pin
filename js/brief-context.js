@@ -1,5 +1,7 @@
 // Tính context Daily Brief từ dữ liệu pins + user. Hàm thuần, không đụng DOM.
 (function(){
+  const LEADER_ROLE = 'Lãnh đạo phòng';
+
   function daysUntil(deadline, now){
     if(!deadline) return null;
     const today = new Date(now); today.setHours(0,0,0,0);
@@ -69,8 +71,10 @@
   function build({pins, user, teams, members, now, weather}){
     now = now || new Date();
     const cfg = window.BRIEF_CONFIG || {};
-    const mine = (pins || []).filter(p => isMine(p, user));
-    const open = mine.filter(p => !p.done);
+    // lãnh đạo phòng không thuộc tổ nào — brief tổng hợp toàn phòng thay vì cá nhân
+    const isLeader = !!user && user.team === LEADER_ROLE;
+    const pool = isLeader ? (pins || []) : (pins || []).filter(p => isMine(p, user));
+    const open = pool.filter(p => !p.done);
 
     const attention = open.filter(p => needsAttention(p, now));
     const highPrio = open.filter(isHighPriority);
@@ -102,7 +106,7 @@
       attention: attention.length,
       highPrio: highPrio.length,
       overdue, dueToday, dueSoon,
-      unseen, crossTeam, load
+      unseen, crossTeam, load, isLeader
     };
   }
 
