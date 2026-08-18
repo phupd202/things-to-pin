@@ -87,6 +87,13 @@
       else if(days <= 3) dueSoon++;
     });
 
+    // phần việc riêng của lãnh đạo (pin tự tạo hoặc được gán đích danh)
+    const mineOpen = isLeader ? open.filter(p => isMine(p, user)) : open;
+    const mineAttention = isLeader ? mineOpen.filter(p => needsAttention(p, now)).length : attention.length;
+    let mineOverdue = 0;
+    if(isLeader) mineOpen.forEach(p => { const d = daysUntil(p.deadline, now); if(d !== null && d < 0) mineOverdue++; });
+    else mineOverdue = overdue;
+
     const unseen = (pins || []).filter(p =>
       !p.done && user && p.author !== user.display && !(p.viewers || []).includes(user.display)
     ).length;
@@ -106,7 +113,8 @@
       attention: attention.length,
       highPrio: highPrio.length,
       overdue, dueToday, dueSoon,
-      unseen, crossTeam, load, isLeader
+      unseen, crossTeam, load, isLeader,
+      mineAttention, mineOverdue
     };
   }
 

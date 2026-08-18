@@ -8,9 +8,18 @@
   function statusLine(c){
     // lãnh đạo phòng: nói về toàn phòng thay vì cá nhân
     const who = c.isLeader ? 'cả phòng' : 'bạn';
-    if(c.attention === 0) return `Hôm nay ${who} không có lưu ý khẩn nào.`;
+    if(c.attention === 0) return `Hôm nay ${who} không có lưu ý khẩn nào. ${mineLine(c)}`.trim();
     let s = `Hôm nay ${who} có ${c.attention} lưu ý cần chú ý`;
     if(c.highPrio > 0) s += `, trong đó ${c.highPrio} việc ưu tiên cao`;
+    s += '.';
+    return (s + ' ' + mineLine(c)).trim();
+  }
+  // phần việc riêng của lãnh đạo, nối sau số liệu toàn phòng
+  function mineLine(c){
+    if(!c.isLeader) return '';
+    if(c.mineAttention === 0) return 'Riêng bạn không có việc nào cần chú ý.';
+    let s = `Riêng bạn có ${c.mineAttention} việc cần chú ý`;
+    if(c.mineOverdue > 0) s += `, ${c.mineOverdue} việc đã quá hạn`;
     return s + '.';
   }
   function deadlineLine(c){
@@ -40,7 +49,7 @@
     // ---- Thời tiết / tình huống đặc thù (priority 2) ----
     {id:'rain-free', priority:2,
       match: c => (c.weather === 'rain' || c.weather === 'storm') && c.attention === 0,
-      text: c => `🌧️ Trời đang mưa, mà bảng ghim hôm nay cũng khá yên bình. ${c.isLeader ? 'Cả phòng' : 'Bạn'} không có lưu ý khẩn nào, cứ từ từ thôi nhé ${c.name}.`},
+      text: c => `🌧️ Trời đang mưa, mà bảng ghim hôm nay cũng khá yên bình. ${c.isLeader ? 'Cả phòng' : 'Bạn'} không có lưu ý khẩn nào, cứ từ từ thôi nhé ${c.name}. ${mineLine(c)}`},
     {id:'rain-busy', priority:2,
       match: c => (c.weather === 'rain' || c.weather === 'storm') && c.attention > 0,
       text: c => `🌧️ Ngoài trời mưa, trong bảng ghim cũng "mưa" việc nhẹ: ${statusLine(c).toLowerCase().replace('hôm nay ','')} ${deadlineLine(c)}`},
@@ -52,7 +61,7 @@
       text: c => `🧣 Trời lạnh ${c.temp}°C, giữ ấm nhé ${c.name}. ${statusLine(c)} ${deadlineLine(c)}`},
     {id:'overdue-alert', priority:2,
       match: c => c.overdue > 0,
-      text: c => `${hello(c)} Nhắc nhỏ: ${c.isLeader ? 'cả phòng' : 'bạn'} đang có ${c.overdue} việc quá hạn cần xử lý sớm${c.dueToday > 0 ? `, cộng thêm ${c.dueToday} deadline hôm nay` : ''}. Xem ngay bên dưới nhé.`},
+      text: c => `${hello(c)} Nhắc nhỏ: ${c.isLeader ? 'cả phòng' : 'bạn'} đang có ${c.overdue} việc quá hạn cần xử lý sớm${c.dueToday > 0 ? `, cộng thêm ${c.dueToday} deadline hôm nay` : ''}. ${mineLine(c)} Xem ngay bên dưới nhé.`},
     {id:'due-today', priority:2,
       match: c => c.overdue === 0 && c.dueToday > 0,
       text: c => `${hello(c)} Hôm nay có ${c.dueToday} deadline đến hạn — ưu tiên xử lý trước nhé. ${unseenLine(c)}`},
@@ -61,7 +70,7 @@
       text: c => `${hello(c)} Có ${c.crossTeam} việc cần phối hợp liên tổ đang chờ. ${statusLine(c)}`},
     {id:'very-busy', priority:2,
       match: c => c.load === 'busy',
-      text: c => `🔥 Hôm nay hơi bận một chút đấy ${c.name}. ${c.isLeader ? 'Cả phòng' : 'Bạn'} có ${c.attention} pin cần chú ý${c.highPrio > 0 ? `, ${c.highPrio} việc ưu tiên cao` : ''}. Làm từng việc một thôi nhé.`},
+      text: c => `🔥 Hôm nay hơi bận một chút đấy ${c.name}. ${c.isLeader ? 'Cả phòng' : 'Bạn'} có ${c.attention} pin cần chú ý${c.highPrio > 0 ? `, ${c.highPrio} việc ưu tiên cao` : ''}. ${mineLine(c)} Làm từng việc một thôi nhé.`},
 
     // ---- Chung theo thời điểm trong ngày (priority 1) ----
     {id:'morning-1', priority:1,
@@ -90,7 +99,7 @@
       text: c => `${hello(c)} Điểm nhanh trước khi nghỉ: ${statusLine(c).toLowerCase()} ${deadlineLine(c)}`},
     {id:'free-day', priority:1,
       match: c => c.load === 'free',
-      text: c => `${hello(c)} Bảng ghim của ${c.isLeader ? 'phòng' : 'bạn'} đang nhẹ nhàng — không có lưu ý khẩn nào. ${c.unseen > 0 ? unseenLine(c) : 'Ngó qua việc của phòng một vòng nhé.'}`},
+      text: c => `${hello(c)} Bảng ghim của ${c.isLeader ? 'phòng' : 'bạn'} đang nhẹ nhàng — không có lưu ý khẩn nào. ${mineLine(c)} ${c.unseen > 0 ? unseenLine(c) : 'Ngó qua việc của phòng một vòng nhé.'}`},
     {id:'fallback', priority:0,
       match: () => true,
       text: c => `Chào ${c.name} 👋 — đây là mọi thứ phòng đang cần đọc, cần làm hôm nay. ${statusLine(c)}`}
