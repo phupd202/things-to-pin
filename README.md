@@ -21,9 +21,9 @@ Bảng ghim chung của phòng — thay cho việc pin nhiều nội dung trên 
 
 ## Công nghệ
 
-- Frontend: HTML + CSS + Vanilla JS (không build step).
+- Frontend: HTML + CSS + Vanilla JS. Local chạy file nguồn; production gộp + minify bằng [esbuild](https://esbuild.github.io).
 - Backend: [Supabase](https://supabase.com) (Postgres + API + Realtime).
-- Deploy: Vercel (static site).
+- Deploy: Vercel — chỉ xuất thư mục `dist/` (mã nguồn `js/*.js` không được public).
 
 ## Cài đặt
 
@@ -47,7 +47,7 @@ window.APP_CONFIG = {
 
 ### 2. Chạy local
 
-Chỉ cần serve thư mục tĩnh:
+Serve thư mục nguồn (không cần minify, dễ debug):
 
 ```bash
 python3 -m http.server 8080
@@ -56,15 +56,27 @@ python3 -m http.server 8080
 
 Mở http://localhost:8080
 
+Xem bản production (đã minify) trên máy:
+
+```bash
+npm install
+npm run preview
+```
+
 ### 3. Deploy Vercel
 
 1. Import repo này trên [vercel.com/new](https://vercel.com/new) (hoặc chạy `npx vercel --prod`).
 2. Để không phải commit key: vào **Project → Settings → Environment Variables**, thêm:
    - `SUPABASE_URL` = Project URL
    - `SUPABASE_ANON_KEY` = anon public key
-3. Redeploy. Lúc build, `scripts/build-config.js` tự sinh `js/config.js` từ 2 biến này; nếu chưa đặt biến thì giữ nguyên `js/config.js` trong repo.
+3. Redeploy. Lúc build, `npm run build` (`scripts/build.js`):
+   - Ghi config từ 2 biến môi trường trên vào bundle (nếu chưa đặt thì dùng `js/config.js` trong repo).
+   - Gộp + minify toàn bộ JS thành 1 file, minify CSS, ghi vào `dist/`.
+   - Vercel chỉ publish `dist/` — không public file nguồn.
 
 Mỗi lần merge vào `main`, Vercel tự deploy lại.
+
+> Minify làm mã khó đọc và giảm dung lượng; **không** phải lớp bảo mật. Anon key vẫn nằm trong JS phía client. Bảo mật thật sự nằm ở RLS/policy phía Supabase.
 
 ## Phase 2 (dự kiến)
 

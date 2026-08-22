@@ -1,6 +1,6 @@
 # Thiết kế giao diện & CSS — Things to Pin
 
-Tài liệu tham khảo cho ai muốn chỉnh giao diện. Toàn bộ style nằm trong **một file** `css/style.css` (~550 dòng), không framework, không preprocessor, không build.
+Tài liệu tham khảo cho ai muốn chỉnh giao diện. Toàn bộ style nằm trong **một file** `css/style.css` (~550 dòng), không framework, không preprocessor. Production minify CSS lúc `npm run build`.
 
 ## 1. Triết lý thiết kế
 
